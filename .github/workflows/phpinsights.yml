@@ -25,4 +25,4 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Rodar PHP Insights
-        run: php-insights analyse --no-interaction --min-quality=85 --min-complexity=80 --min-architecture=80 --min-style=80
+        run:  vendor/bin/php-insights analyse --no-interaction --min-quality=85 --min-complexity=80 --min-architecture=80 --min-style=80
