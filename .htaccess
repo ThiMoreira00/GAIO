@@ -1,0 +1,42 @@
+# Ativar o modo de reescrita
+RewriteEngine On
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{REQUEST_URI} !^/resources/views/erros/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^.*$ index.php [L,QSA]
+</IfModule>
+
+# Redirecionamento de erros personalizados
+ErrorDocument 403 /resources/views/erros/erro-403.php
+ErrorDocument 404 /resources/views/erros/erro-404.php
+ErrorDocument 405 /resources/views/erros/erro-405.php
+
+# Segurança básica
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Proteção contra listagem de diretórios
+Options -Indexes
+
+# Proteção contra acesso a arquivos sensíveis
+<FilesMatch "\.(htaccess|htpasswd|ini|env|log|sh|bak|sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Forçar uso de HTTPS (opcional)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Evitar cache para arquivos PHP (opcional)
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+</FilesMatch>

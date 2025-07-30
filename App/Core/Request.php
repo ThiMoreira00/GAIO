@@ -1,0 +1,175 @@
+<?php
+
+namespace App\Core;
+
+/**
+ * Classe Request
+ *
+ * Encapsula a requisição HTTP, fornecendo uma API limpa para acessar
+ * dados de GET, POST, SERVER e parâmetros da rota.
+ * Realiza a sanitização automática dos dados de entrada.
+ */
+class Request
+{
+    private array $getParams;
+    private array $postParams;
+    private array $serverParams;
+    private array $routeParams;
+    private array $fileParams;
+
+    /**
+     * @param array $routeParams Parâmetros extraídos da URI pelo Router (ex: ['id' => 123]).
+     */
+    public function __construct(array $routeParams = [])
+    {
+        $this->getParams = $this->sanitizar($_GET);
+        $this->postParams = $this->sanitizar($_POST);
+        $this->serverParams = $_SERVER;
+        $this->fileParams = $_FILES;
+        $this->routeParams = $this->sanitizar($routeParams);
+    }
+
+    public function method(): string
+    {
+        return $this->server('REQUEST_METHOD');
+    }
+
+    public function uri(): string
+    {
+        return parse_url($this->server('REQUEST_URI'), PHP_URL_PATH);
+    }
+
+    public function get(string $chave, $default = null)
+    {
+        return $this->getParams[$chave] ?? $default;
+    }
+
+    public function post(string $chave, $default = null)
+    {
+        return $this->postParams[$chave] ?? $default;
+    }
+
+    public function file(string $chave, $default = null)
+    {
+        return $this->fileParams[$chave] ?? $default;
+    }
+
+    public function files(): array
+    {
+        return $this->fileParams;
+    }
+
+    public function all(): array
+    {
+        return array_merge($this->getParams, $this->postParams);
+    }
+
+    public function parametroRota(string $chave, $default = null)
+    {
+        return $this->routeParams[$chave] ?? $default;
+    }
+
+    public function parametrosRota(): array
+    {
+        return $this->routeParams;
+    }
+
+    public function server(string $chave, $default = null)
+    {
+        return $this->serverParams[$chave] ?? $default;
+    }
+
+    private function sanitizar(mixed $dados): mixed
+    {
+        if (is_array($dados)) {
+            return array_map([$this, 'sanitizar'], $dados);
+        }
+        if (!is_string($dados)) {
+            return $dados;
+        }
+        return strip_tags(trim($dados));
+    }
+
+    public function ip()
+    {
+        return $this->server('REMOTE_ADDR');
+    }
+
+    public function userAgent() {
+        return $this->server('HTTP_USER_AGENT');
+    }
+
+    public function navegador() {
+        $userAgent = $this->userAgent();
+
+        if (preg_match('/Edg/i', $userAgent)) {
+            // Edge (baseado em Chromium)
+            $navegador = 'Edge';
+        } elseif (preg_match('/MSIE/i', $userAgent) || preg_match('/Trident/i', $userAgent)) {
+            // Internet Explorer
+            $navegador = 'Internet Explorer';
+        } elseif (preg_match('/Firefox/i', $userAgent)) {
+            $navegador = 'Firefox';
+        } elseif (preg_match('/OPR/i', $userAgent) || preg_match('/Opera/i', $userAgent)) {
+            $navegador = 'Opera';
+        } elseif (preg_match('/Chrome/i', $userAgent) && !preg_match('/Edg/i', $userAgent)) {
+            // Chrome (e garante que não é o Edge)
+            $navegador = 'Chrome';
+        } elseif (preg_match('/Safari/i', $userAgent) && !preg_match('/Chrome/i', $userAgent)) {
+            // Safari (e garante que não é o Chrome ou outros baseados em WebKit)
+            $navegador = 'Safari';
+        } else {
+            $navegador = 'Outro';
+        }
+
+        return $navegador;
+    }
+
+    public function sistemaOperacional() {
+        $userAgent = $this->userAgent();
+
+        if (preg_match('/windows|win32/i', $userAgent)) {
+            $so = 'Windows';
+        } elseif (preg_match('/macintosh|mac os x/i', $userAgent)) {
+            $so = 'macOS';
+        } elseif (preg_match('/linux/i', $userAgent)) {
+            $so = 'Linux';
+        } elseif (preg_match('/android/i', $userAgent)) {
+            $so = 'Android';
+        } elseif (preg_match('/iphone|ipad|ipod/i', $userAgent)) {
+            $so = 'iOS';
+        } else {
+            $so = 'Outro';
+        }
+
+        return $so;
+    }
+
+    /**
+     * Obtém o tipo MIME do arquivo enviado
+     *
+     * @param string $chave Nome do campo do arquivo no formulário
+     * @return string|null Retorna o tipo MIME do arquivo ou null se não existir
+     */
+    public function obterTipo(string $chave): ?string
+    {
+        $arquivo = $this->file($chave);
+
+        if (!$arquivo || !isset($arquivo['type'])) {
+            return null;
+        }
+
+        return $arquivo['type'];
+    }
+
+    public function obterTamanho(string $chave): ?int
+    {
+        $arquivo = $this->file($chave);
+
+        if (!$arquivo || !isset($arquivo['size'])) {
+            return null;
+        }
+
+        return $arquivo['size'];
+    }
+}
