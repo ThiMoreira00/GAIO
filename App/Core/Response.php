@@ -30,11 +30,11 @@ class Response
      * Define os cabeçalhos apropriados, converte os dados para JSON e
      * finaliza a execução do script.
      *
-     * @param mixed $data Dados a serem convertidos para JSON.
+     * @param array $data Dados a serem convertidos para JSON.
      * @param int $statusCode Código de status HTTP.
      * @return never
      */
-    public static function json(mixed $data, int $statusCode = 200): never
+    public static function json(array $data, int $statusCode = 200): never
     {
         self::atribuirCodigoStatus($statusCode);
         header('Content-Type: application/json; charset=utf-8');
@@ -52,7 +52,7 @@ class Response
      */
     public static function redirecionar(string $url): never
     {
-        header("Location: $url");
+        header("Location: {$url}");
         exit;
     }
 

@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Core\Router;
 use App\Middlewares\ControleAcessoMiddleware;
-
 
 /* ========================================
  * ROTAS EXTERNAS
@@ -22,23 +23,20 @@ Router::get('/redefinir-senha/{token}', 'AutenticacaoController@exibirRedefinica
 Router::post('/redefinir-senha', 'AutenticacaoController@salvarNovaSenha');
 
 // Validações Públicas
-Router::grupo(['prefixo' => 'validar'], function() {
-    // Documentos
-    Router::get('/documento', 'ValidacaoController@exibirDocumento');
-    Router::post('/documento', 'ValidacaoController@validarDocumento');
+// Documentos
+Router::get('/documento', 'ValidacaoController@exibirDocumento');
+Router::post('/documento', 'ValidacaoController@validarDocumento');
 
-    // Carteirinha
-    Router::get('/carteirinha', 'ValidacaoController@exibirCarteirinha');
-    Router::post('/carteirinha', 'ValidacaoController@validarCarteirinha');
-});
-
+// Carteirinha
+Router::get('/carteirinha', 'ValidacaoController@exibirCarteirinha');
+Router::post('/carteirinha', 'ValidacaoController@validarCarteirinha');
 
 /*  ========================================
  * ROTAS INTERNAS
  ======================================== */
 
 // Rotas para usuário (usuários logados podem executar)
-Router::grupo(['middleware' => new ControleAcessoMiddleware('usuario')], function () {
+Router::grupo(['middleware' => new ControleAcessoMiddleware('usuario')], function (): void {
 
     // Configurações
     Router::grupo([], function() {
@@ -58,7 +56,7 @@ Router::grupo(['middleware' => new ControleAcessoMiddleware('usuario')], functio
 
 });
 
-Router::grupo(['middleware' => new ControleAcessoMiddleware('aluno')], function () {
+Router::grupo(['middleware' => new ControleAcessoMiddleware('aluno')], function (): void {
 
     // Dashboard
     Router::get('/', 'AlunoController@index');
@@ -66,16 +64,14 @@ Router::grupo(['middleware' => new ControleAcessoMiddleware('aluno')], function 
 
 });
 
-
-Router::grupo(['middleware' => new ControleAcessoMiddleware('professor')], function () {
+Router::grupo(['middleware' => new ControleAcessoMiddleware('professor')], function (): void {
 
     Router::get('/', 'ProfessorController@index');
     Router::get('/inicio', 'ProfessorController@index');
 
 });
 
-
-Router::grupo(['middleware' => new ControleAcessoMiddleware('administrador')], function () {
+Router::grupo(['middleware' => new ControleAcessoMiddleware('administrador')], function (): void {
 
     Router::get('/', 'AdministradorController@index');
     Router::get('/inicio', 'AdministradorController@index');

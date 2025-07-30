@@ -2,14 +2,20 @@
 
 namespace App\Core;
 
-use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 abstract class Model extends EloquentModel
 {
+    public const CREATED_AT = 'criado_em';
+    public const UPDATED_AT = 'atualizado_em';
 
-    const CREATED_AT = 'criado_em';
-    const UPDATED_AT = 'atualizado_em';
+    /**
+     * Define se o modelo deve registrar `created_at` e `updated_at`.
+     * Por padrão é `true`.
+     * @var bool
+     */
+    public $timestamps = false;
 
     /**
      * O nome da tabela associada ao modelo.
@@ -37,13 +43,6 @@ abstract class Model extends EloquentModel
      * @var array
      */
     protected $casts = [];
-
-    /**
-     * Define se o modelo deve registrar `created_at` e `updated_at`.
-     * Por padrão é `true`.
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * Função-base para criar um registro no modelo do banco de dados
@@ -136,6 +135,4 @@ abstract class Model extends EloquentModel
     public function total(): int {
         return $this->count();
     }
-
-
 }

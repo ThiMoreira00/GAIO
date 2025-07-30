@@ -20,14 +20,20 @@ class Request
     /**
      * @param array $routeParams Parâmetros extraídos da URI pelo Router (ex: ['id' => 123]).
      */
-    public function __construct(array $routeParams = [])
-    {
-        $this->getParams = $this->sanitizar($_GET);
-        $this->postParams = $this->sanitizar($_POST);
-        $this->serverParams = $_SERVER;
-        $this->fileParams = $_FILES;
+    public function __construct(
+        array $get = null,
+        array $post = null,
+        array $server = null,
+        array $files = null,
+        array $routeParams = []
+    ) {
+        $this->getParams = $this->sanitizar($get ?? $_GET);
+        $this->postParams = $this->sanitizar($post ?? $_POST);
+        $this->serverParams = $server ?? $_SERVER;
+        $this->fileParams = $files ?? $_FILES;
         $this->routeParams = $this->sanitizar($routeParams);
     }
+
 
     public function method(): string
     {
@@ -79,70 +85,53 @@ class Request
         return $this->serverParams[$chave] ?? $default;
     }
 
-    private function sanitizar(mixed $dados): mixed
-    {
-        if (is_array($dados)) {
-            return array_map([$this, 'sanitizar'], $dados);
-        }
-        if (!is_string($dados)) {
-            return $dados;
-        }
-        return strip_tags(trim($dados));
-    }
-
     public function ip()
     {
         return $this->server('REMOTE_ADDR');
     }
 
-    public function userAgent() {
+    public function userAgent(): ?string
+    {
         return $this->server('HTTP_USER_AGENT');
     }
 
-    public function navegador() {
-        $userAgent = $this->userAgent();
+    /**
+     * Determina o navegador com base na string User-Agent.
+     *
+     * @return $string
+     */
+    public function navegador(): string
+    {
+        $userAgent = $this->userAgent() ?? '';
 
-        if (preg_match('/Edg/i', $userAgent)) {
-            // Edge (baseado em Chromium)
-            $navegador = 'Edge';
-        } elseif (preg_match('/MSIE/i', $userAgent) || preg_match('/Trident/i', $userAgent)) {
-            // Internet Explorer
-            $navegador = 'Internet Explorer';
-        } elseif (preg_match('/Firefox/i', $userAgent)) {
-            $navegador = 'Firefox';
-        } elseif (preg_match('/OPR/i', $userAgent) || preg_match('/Opera/i', $userAgent)) {
-            $navegador = 'Opera';
-        } elseif (preg_match('/Chrome/i', $userAgent) && !preg_match('/Edg/i', $userAgent)) {
-            // Chrome (e garante que não é o Edge)
-            $navegador = 'Chrome';
-        } elseif (preg_match('/Safari/i', $userAgent) && !preg_match('/Chrome/i', $userAgent)) {
-            // Safari (e garante que não é o Chrome ou outros baseados em WebKit)
-            $navegador = 'Safari';
-        } else {
-            $navegador = 'Outro';
-        }
-
-        return $navegador;
+        return match (true) {
+            (bool) preg_match('/Edg/i', $userAgent) => 'Edge',
+            (bool) preg_match('/MSIE|Trident/i', $userAgent) => 'Internet Explorer',
+            (bool) preg_match('/Firefox/i', $userAgent) => 'Firefox',
+            (bool) preg_match('/OPR|Opera/i', $userAgent) => 'Opera',
+            (bool) preg_match('/Chrome/i', $userAgent) => 'Chrome',
+            (bool) preg_match('/Safari/i', $userAgent) => 'Safari',
+            default => 'Outro',
+        };
     }
 
-    public function sistemaOperacional() {
-        $userAgent = $this->userAgent();
+    /**
+     * Determina o sistema operacional com base na string User-Agent.
+     *
+     * @return string
+     */
+    public function sistemaOperacional(): string
+    {
+        $userAgent = $this->userAgent() ?? '';
 
-        if (preg_match('/windows|win32/i', $userAgent)) {
-            $so = 'Windows';
-        } elseif (preg_match('/macintosh|mac os x/i', $userAgent)) {
-            $so = 'macOS';
-        } elseif (preg_match('/linux/i', $userAgent)) {
-            $so = 'Linux';
-        } elseif (preg_match('/android/i', $userAgent)) {
-            $so = 'Android';
-        } elseif (preg_match('/iphone|ipad|ipod/i', $userAgent)) {
-            $so = 'iOS';
-        } else {
-            $so = 'Outro';
-        }
-
-        return $so;
+        return match (true) {
+            (bool) preg_match('/windows|win32/i', $userAgent) => 'Windows',
+            (bool) preg_match('/macintosh|mac os x/i', $userAgent) => 'macOS',
+            (bool) preg_match('/linux/i', $userAgent) => 'Linux',
+            (bool) preg_match('/android/i', $userAgent) => 'Android',
+            (bool) preg_match('/iphone|ipad|ipod/i', $userAgent) => 'iOS',
+            default => 'Outro',
+        };
     }
 
     /**
@@ -171,5 +160,16 @@ class Request
         }
 
         return $arquivo['size'];
+    }
+
+    private function sanitizar(mixed $dados): mixed
+    {
+        if (is_array($dados)) {
+            return array_map([$this, 'sanitizar'], $dados);
+        }
+        if (!is_string($dados)) {
+            return $dados;
+        }
+        return strip_tags(trim($dados));
     }
 }

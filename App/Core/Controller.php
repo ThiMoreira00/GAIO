@@ -17,7 +17,6 @@ use Random\RandomException;
  */
 abstract class Controller
 {
-
     /**
      * Gera um token CSRF.
      * (Responsabilidade do Controller, pois está ligado à segurança da sessão/formulário)
@@ -27,7 +26,7 @@ abstract class Controller
      */
     protected function gerarTokenCSRF(): string
     {
-        if (empty($_SESSION['token_csrf'])) {
+        if (!isset($_SESSION['token_csrf'])) {
             $_SESSION['token_csrf'] = bin2hex(random_bytes(32));
         }
         return $_SESSION['token_csrf'];
@@ -108,11 +107,11 @@ abstract class Controller
      * Envia resposta em formato JSON.
      * (Wrapper para o método da classe Response)
      *
-     * @param mixed $dados Dados a serem convertidos para JSON.
+     * @param array $dados Dados a serem convertidos para JSON.
      * @param int $codigoHttp Código de status HTTP.
      * @return never
      */
-    protected function responderJson(mixed $dados, int $codigoHttp = 200): never
+    protected function responderJson(array $dados, int $codigoHttp = 200): never
     {
         Response::json($dados, $codigoHttp);
     }
