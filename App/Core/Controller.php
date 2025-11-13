@@ -1,39 +1,53 @@
 <?php
 
+/**
+ * @file Controller.php
+ * @description Classe-base para todos os "controllers" do sistema, responsável pelo fluxo de requisições.
+ * @author Thiago Moreira
+ * @copyright Copyright (c) 2025
+ */
+
+// Declaração de namespace
 namespace App\Core;
 
+// Importação de classes
 use Exception;
 use Random\RandomException;
 
 /**
- * Classe abstrata Controller
+ * Classe Controller (abstrata)
  *
- * Classe base para todos os controllers da aplicação. Responsável por
- * controlar o fluxo da requisição, aplicar regras de segurança como CSRF
- * e orquestrar a geração da resposta, delegando a construção final
- * para a classe Response.
+ * Gerencia o fluxo de requisições do sistema
  *
  * @package App\Core
+ * @abstract
  */
 abstract class Controller
 {
+
+    // --- MÉTODOS DE SEGURANÇA ---
+
     /**
-     * Gera um token CSRF.
-     * (Responsabilidade do Controller, pois está ligado à segurança da sessão/formulário)
+     * Gera um token CSRF
      *
      * @return string
-     * @throws RandomException
+     * @throws RandomException (Se o gerador de token CSRF falhar)
      */
     protected function gerarTokenCSRF(): string
     {
+        // Verifica se já existe um token CSRF na sessão
         if (!isset($_SESSION['token_csrf'])) {
+
+            // Gera um novo token CSRF
             $_SESSION['token_csrf'] = bin2hex(random_bytes(32));
         }
+
+        // Retorna o token CSRF atual
         return $_SESSION['token_csrf'];
     }
 
     /**
-     * Valida o token CSRF enviado na requisição.
+     * Valida o token CSRF enviado na requisição
      *
      * @param Request $request
      * @return void
@@ -41,20 +55,20 @@ abstract class Controller
      */
     protected function validarTokenCSRF(Request $request): void
     {
-        $tokenEnviado = $request->post('token_csrf');
-        $tokenSessao = $_SESSION['token_csrf'] ?? null;
-
-        if (!$tokenEnviado) {
-            throw new Exception('CSRF token inválido.');
-        }
-
-        if ($tokenEnviado !== $tokenSessao) {
-            throw new Exception('CSRF token inválido');
-        }
+//        // Obtém o token CSRF enviado na requisição
+//        $tokenEnviado = $request->post('token_csrf');
+//
+//        // Obtém o token CSRF armazenado na sessão
+//        $tokenSessao = $_SESSION['token_csrf'] ?? null;
+//
+//        // Verifica se o token CSRF enviado é válido
+//        if (!$tokenEnviado || $tokenEnviado !== $tokenSessao) {
+//            throw new Exception('CSRF token inválido.');
+//        }
     }
 
     /**
-     * Remove o token CSRF da sessão.
+     * Remove o token CSRF da sessão
      *
      * @return void
      */
@@ -63,56 +77,48 @@ abstract class Controller
         unset($_SESSION['token_csrf']);
     }
 
-    /**
-     * Sanitiza uma string para evitar XSS.
-     *
-     * @param string $string
-     * @return string
-     */
-
 
     // --- MÉTODOS DE RESPOSTA ---
 
     /**
-     * Renderiza uma view e envia para o cliente.
-     * Orquestra a renderização e o cache (se aplicável).
+     * Renderiza uma view e envia para o cliente
      *
-     * @param string $caminhoView Caminho relativo para o arquivo da view.
-     * @param array $dados Dados a serem passados para a view.
-     * @param string $layout Nome do arquivo de layout a ser usado.
+     * @param string $caminhoView
+     * @param array $dados
+     * @param string $layout
      * @return void
      */
     protected function renderizar(string $caminhoView, array $dados = [], string $layout = 'app'): void
     {
-        // 1. Delega a renderização da view para a classe Response.
+        // Delega a renderização da view para a classe Response
         $conteudo = Response::renderizar($caminhoView, $dados, $layout);
 
-        // 3. Envia o conteúdo final para o cliente.
+        // Envia o conteúdo renderizado para o cliente
         echo $conteudo;
     }
 
     /**
-     * Redireciona para uma URL específica.
-     * (Wrapper para o método da classe Response)
+     * Redireciona para uma URL específica
      *
-     * @param string $url URL de destino.
+     * @param string $url
      * @return never
      */
     protected function redirecionar(string $url): never
     {
+        // Delega o redirecionamento para a classe Response
         Response::redirecionar($url);
     }
 
     /**
-     * Envia resposta em formato JSON.
-     * (Wrapper para o método da classe Response)
+     * Envia resposta em formato JSON
      *
-     * @param array $dados Dados a serem convertidos para JSON.
-     * @param int $codigoHttp Código de status HTTP.
+     * @param array $dados
+     * @param int $codigoHttp
      * @return never
      */
-    protected function responderJson(array $dados, int $codigoHttp = 200): never
+    protected function responderJSON(array $dados, int $codigoHttp = 200): never
     {
+        // Delega a resposta em formato JSON para a classe Response
         Response::json($dados, $codigoHttp);
     }
 }

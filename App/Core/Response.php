@@ -1,53 +1,61 @@
 <?php
 
+/**
+ * @file Response.php
+ * @description Classe-base para todos os "responses" do sistema, responsável por todas as respostas e visualizações para serem exibidas ao cliente.
+ * @author Thiago Moreira
+ * @copyright Copyright (c) 2025
+ */
+
+// Declaração de namespace
 namespace App\Core;
+
+// Importação de classes
+use Exception;
 
 /**
  * Classe Response
  *
- * Encapsula a lógica para enviar respostas HTTP para o cliente.
- * É responsável por definir cabeçalhos, códigos de status e enviar o conteúdo
- * final, seja ele HTML, JSON ou um redirecionamento.
+ * Encapsula a lógica para gerar e enviar respostas HTTP.
  *
  * @package App\Core
+ * @abstract
  */
-class Response
+abstract class Response
 {
+
+    // --- MÉTODOS ---
+
     /**
-     * Define o código de status da resposta HTTP.
+     * Define o código de status da resposta HTTP
      *
-     * @param int $code O código de status (ex: 200, 404, 500).
+     * @param int $codigo
      * @return void
      */
-    public static function atribuirCodigoStatus(int $code): void
+    public static function atribuirCodigoStatus(int $codigo): void
     {
-        http_response_code($code);
+        http_response_code($codigo);
     }
 
     /**
-     * Envia uma resposta em formato JSON.
+     * Envia uma resposta em formato JSON
      *
-     * Define os cabeçalhos apropriados, converte os dados para JSON e
-     * finaliza a execução do script.
-     *
-     * @param array $data Dados a serem convertidos para JSON.
-     * @param int $statusCode Código de status HTTP.
+     * @param array $dados
+     * @param int $codigoStatus
      * @return never
      */
-    public static function json(array $data, int $statusCode = 200): never
+    public static function json(array $dados, int $codigoStatus = 200): never
     {
-        self::atribuirCodigoStatus($statusCode);
+        self::atribuirCodigoStatus($codigoStatus);
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($data);
+        echo json_encode($dados);
         exit;
     }
 
     /**
-     * Redireciona o cliente para uma nova URL.
+     * Redireciona o cliente para uma nova URL
      *
-     * Envia o cabeçalho de 'Location' e finaliza a execução do script.
-     *
-     * @param string $url URL de destino.
+     * @param string $url
      * @return never
      */
     public static function redirecionar(string $url): never
@@ -57,51 +65,56 @@ class Response
     }
 
     /**
-     * Renderiza uma view e a retorna como uma string.
+     * Renderiza uma view e a retorna como uma string HTML
      *
-     * Esta função processa o modelo da view com os dados fornecidos e o
-     * encapsula em um layout (se especificado), retornando o HTML final.
-     *
-     * @param string $viewPath Caminho relativo para o arquivo da view (sem .php).
-     * @param array $data Dados a serem extraídos e passados para a view.
-     * @param string|null $layout Nome do arquivo de layout a ser usado. Null para nenhum.
-     * @return string O conteúdo HTML renderizado.
+     * @param string $caminhoView
+     * @param array $dados
+     * @param string|null $layout
+     * @return string
      */
-    public static function renderizar(string $caminhoView, array $data = [], ?string $layout = 'app'): string
+    public static function renderizar(string $caminhoView, array $dados = [], ?string $layout = 'app'): string
     {
-        // Extrai as variáveis para ficarem disponíveis na view.
-        extract($data);
 
-        $caminhoCompleto = __DIR__ . "/../../resources/views/{$caminhoView}.php";
-        if (!file_exists($caminhoCompleto)) {
-            self::atribuirCodigoStatus(500);
-            // Em produção, seria melhor lançar uma exceção que resulta numa página de erro amigável.
-            die("ERRO: View não encontrada em {$caminhoCompleto}");
-        }
+        try {
+            // Extrai as variáveis para ficarem disponíveis na view
+            extract($dados);
 
-        // Inicia o buffer de saída para capturar o conteúdo da view.
-        ob_start();
-        require $caminhoCompleto;
-        $conteudo = ob_get_clean();
+            // Verifica se a view existe
+            $caminhoCompleto = __DIR__ . "/../../resources/views/{$caminhoView}.php";
 
-        // Lógica para desativar o layout em rotas de autenticação.
-        if (str_contains($caminhoView, 'auth/') || str_contains($caminhoView, 'erros/')) {
-            $layout = null;
-            $caminhoView = str_replace('auth/', '', $caminhoView);
-            $caminhoView = str_replace('erros/', '', $caminhoView);
-        }
+            if (!file_exists($caminhoCompleto)) {
+                self::atribuirCodigoStatus(500);
+                throw new Exception("Visualização '{$caminhoView}' não encontrada.");
+            }
 
-        if ($layout) {
-            // Se um layout for especificado, o conteúdo principal é injetado nele.
-            // O layout também precisa de um buffer para ser capturado como string.
+            // Inicia o buffer de saída para capturar o conteúdo da view
             ob_start();
-            // A variável $content estará disponível dentro do arquivo de layout.
+            require $caminhoCompleto;
+            $conteudo = ob_get_clean();
 
-            require __DIR__ . "/../../resources/views/layouts/{$layout}.php";
-            return ob_get_clean();
+            // Lógica para desativar o layout em rotas de autenticação
+            if (str_contains($caminhoView, 'auth/') || str_contains($caminhoView, 'erros/')) {
+                $layout = null;
+                $caminhoView = str_replace('auth/', '', $caminhoView);
+                $caminhoView = str_replace('erros/', '', $caminhoView);
+            }
+
+            // Se houver layout, inclui o layout e retorna o conteúdo da view
+            if ($layout) {
+                ob_start();
+                require __DIR__ . "/../../resources/views/layouts/{$layout}.php";
+                return ob_get_clean();
+            }
+
+            // Se não houver layout, retorna apenas o conteúdo da view
+            return $conteudo;
+
+        } catch (Exception $exception) {
+
+            // Lógica para tratamento de erros
+            self::atribuirCodigoStatus(500);
+            self::renderizar('erros/erro-500', ['mensagem' => $exception->getMessage()]);
+            exit;
         }
-
-        // Se não houver layout, retorna apenas o conteúdo da view.
-        return $conteudo;
     }
 }

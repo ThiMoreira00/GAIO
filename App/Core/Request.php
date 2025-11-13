@@ -1,109 +1,220 @@
 <?php
 
+/**
+ * @file Request.php
+ * @description Classe-base para todos os "requests" do sistema, responsável pelas requisições com base no roteamento.
+ * @author Thiago Moreira
+ * @copyright Copyright (c) 2025
+ */
+
+// Declaração de namespace
 namespace App\Core;
 
 /**
  * Classe Request
  *
- * Encapsula a requisição HTTP, fornecendo uma API limpa para acessar
- * dados de GET, POST, SERVER e parâmetros da rota.
- * Realiza a sanitização automática dos dados de entrada.
+ * Encapsula a lógica para acessar os dados da requisição HTTP.
+ *
+ * @package App\Core
  */
 class Request
 {
-    private array $getParams;
-    private array $postParams;
-    private array $serverParams;
-    private array $routeParams;
-    private array $fileParams;
+
+    // --- ATRIBUTOS ---
 
     /**
-     * @param array $routeParams Parâmetros extraídos da URI pelo Router (ex: ['id' => 123]).
+     * Parâmetros GET da requisição
+     * @var array|mixed 
      */
-    public function __construct(
-        array $get = null,
-        array $post = null,
-        array $server = null,
-        array $files = null,
-        array $routeParams = []
-    ) {
-        $this->getParams = $this->sanitizar($get ?? $_GET);
-        $this->postParams = $this->sanitizar($post ?? $_POST);
-        $this->serverParams = $server ?? $_SERVER;
-        $this->fileParams = $files ?? $_FILES;
-        $this->routeParams = $this->sanitizar($routeParams);
+    private array $parametrosGET;
+
+    /**
+     * Parâmetros POST da requisição
+     * @var array|mixed 
+     */
+    private array $parametrosPOST;
+
+    /**
+     * Parâmetros do servidor da requisição
+     * @var array 
+     */
+    private array $parametrosSERVER;
+
+    /**
+     * Parâmetros da rota da requisição
+     * @var array|mixed
+     */
+    private array $parametrosRota;
+    
+    /**
+     * Parâmetros de arquivos da requisição
+     * @var array|mixed
+     */
+    private array $parametrosFILES;
+
+
+    // --- MÉTODOS ---
+
+    /**
+     * Construtor da classe
+     *
+     * @param array|null $get Parâmetros GET da requisição.
+     * @param array|null $post Parâmetros POST da requisição.
+     * @param array|null $server Parâmetros do servidor da requisição.
+     * @param array|null $files Parâmetros de arquivos da requisição.
+     * @param array $parametrosRota Parâmetros extraídos da URI pelo Router (ex: ['id' => 123]).
+     */
+    public function __construct(?array $get = null, ?array $post = null, ?array $server = null, ?array $files = null, array $parametrosRota = []) {
+        $this->parametrosGET = $this->sanitizar($get ?? $_GET);
+        $this->parametrosPOST = $this->sanitizar($post ?? $_POST);
+        $this->parametrosSERVER = $server ?? $_SERVER;
+        $this->parametrosFILES = $files ?? $_FILES;
+        $this->parametrosRota = $this->sanitizar($parametrosRota);
+
+        $this->parametrosGET = array_merge($this->parametrosRota, $this->parametrosGET);
     }
 
-
+    /**
+     * Obtém o método HTTP da requisição
+     *
+     * @return string
+     */
     public function method(): string
     {
         return $this->server('REQUEST_METHOD');
     }
 
+    /**
+     * Obtém o URI da requisição
+     *
+     * @return string
+     */
     public function uri(): string
     {
         return parse_url($this->server('REQUEST_URI'), PHP_URL_PATH);
     }
 
-    public function get(string $chave, $default = null)
+    /**
+     * Obtém um parâmetro da requisição GET
+     *
+     * @param string $chave
+     * @param $default
+     * @return mixed|null
+     */
+    public function get(string $chave, $default = null): mixed
     {
-        return $this->getParams[$chave] ?? $default;
+        return $this->parametrosGET[$chave] ?? $default;
     }
 
-    public function post(string $chave, $default = null)
+    /**
+     * Obtém um parâmetro da requisição POST
+     *
+     * @param string $chave
+     * @param $default
+     * @return mixed|null
+     */
+    public function post(string $chave, $default = null): mixed
     {
-        return $this->postParams[$chave] ?? $default;
+        return $this->parametrosPOST[$chave] ?? $default;
     }
 
-    public function file(string $chave, $default = null)
+    /**
+     * Obtém um parâmetro de arquivo da requisição
+     *
+     * @param string $chave
+     * @param $default
+     * @return mixed|null
+     */
+    public function file(string $chave, $default = null): mixed
     {
-        return $this->fileParams[$chave] ?? $default;
+        return $this->parametrosFILES[$chave] ?? $default;
     }
 
+    /**
+     * Obtém todos os parâmetros de arquivos da requisição
+     *
+     * @return array
+     */
     public function files(): array
     {
-        return $this->fileParams;
+        return $this->parametrosFILES;
     }
 
+    /**
+     * Obtém todos os parâmetros da requisição (GET e POST)
+     *
+     * @return array
+     */
     public function all(): array
     {
-        return array_merge($this->getParams, $this->postParams);
+        return array_merge($this->parametrosGET, $this->parametrosPOST);
     }
 
-    public function parametroRota(string $chave, $default = null)
+    /**
+     * Obtém um parâmetro da rota da requisição
+     *
+     * @param string $chave
+     * @param $default
+     * @return mixed|null
+     */
+    public function parametroRota(string $chave, $default = null): mixed
     {
-        return $this->routeParams[$chave] ?? $default;
+        return $this->parametrosRota[$chave] ?? $default;
     }
 
+    /**
+     * Obtém todos os parâmetros da rota da requisição
+     *
+     * @return array
+     */
     public function parametrosRota(): array
     {
-        return $this->routeParams;
+        return $this->parametrosRota;
     }
 
-    public function server(string $chave, $default = null)
+    /**
+     * Obtém um parâmetro do servidor da requisição
+     *
+     * @param string $chave
+     * @param $default
+     * @return mixed|null
+     */
+    public function server(string $chave, $default = null): mixed
     {
-        return $this->serverParams[$chave] ?? $default;
+        return $this->parametrosSERVER[$chave] ?? $default;
     }
 
-    public function ip()
+    /**
+     * Obtém o IP da requisição
+     *
+     * @return string
+     */
+    public function ip(): string
     {
         return $this->server('REMOTE_ADDR');
     }
 
+    /**
+     * Obtém a string User-Agent da requisição
+     *
+     * @return string|null
+     */
     public function userAgent(): ?string
     {
         return $this->server('HTTP_USER_AGENT');
     }
 
     /**
-     * Determina o navegador com base na string User-Agent.
+     * Determina o navegador com base na string User-Agent
      *
-     * @return $string
+     * @return string
      */
     public function navegador(): string
     {
+        // Verifica se o User-Agent está definido
         $userAgent = $this->userAgent() ?? '';
 
+        // Verifica se o User-Agent contém uma string específica
         return match (true) {
             (bool) preg_match('/Edg/i', $userAgent) => 'Edge',
             (bool) preg_match('/MSIE|Trident/i', $userAgent) => 'Internet Explorer',
@@ -111,19 +222,21 @@ class Request
             (bool) preg_match('/OPR|Opera/i', $userAgent) => 'Opera',
             (bool) preg_match('/Chrome/i', $userAgent) => 'Chrome',
             (bool) preg_match('/Safari/i', $userAgent) => 'Safari',
-            default => 'Outro',
+            default => 'Outro'
         };
     }
 
     /**
-     * Determina o sistema operacional com base na string User-Agent.
+     * Determina o sistema operacional com base na string User-Agent
      *
      * @return string
      */
     public function sistemaOperacional(): string
     {
+        // Verifica se o User-Agent está definido
         $userAgent = $this->userAgent() ?? '';
 
+        // Verifica se o User-Agent contém uma string específica
         return match (true) {
             (bool) preg_match('/windows|win32/i', $userAgent) => 'Windows',
             (bool) preg_match('/macintosh|mac os x/i', $userAgent) => 'macOS',
@@ -137,39 +250,100 @@ class Request
     /**
      * Obtém o tipo MIME do arquivo enviado
      *
-     * @param string $chave Nome do campo do arquivo no formulário
-     * @return string|null Retorna o tipo MIME do arquivo ou null se não existir
+     * @param string $chave
+     * @return string|null
      */
-    public function obterTipo(string $chave): ?string
+    public function obterTipoArquivo(string $chave): ?string
     {
+        // Verifica se o arquivo existe e se tem um tipo
         $arquivo = $this->file($chave);
 
         if (!$arquivo || !isset($arquivo['type'])) {
             return null;
         }
 
+        // Retorna o tipo MIME do arquivo
         return $arquivo['type'];
     }
 
-    public function obterTamanho(string $chave): ?int
+    /**
+     * Obtém o tamanho do arquivo enviado
+     *
+     * @param string $chave
+     * @return int|null
+     */
+    public function obterTamanhoArquivo(string $chave): ?int
     {
+        // Verifica se o arquivo existe e se tem um tamanho
         $arquivo = $this->file($chave);
 
         if (!$arquivo || !isset($arquivo['size'])) {
             return null;
         }
 
+        // Retorna o tamanho do arquivo (em bytes)
         return $arquivo['size'];
     }
 
+    /**
+     * Obtém o nome do arquivo enviado
+     *
+     * @param string $chave
+     * @return string|null
+     */
+    public function obterNomeArquivo(string $chave): ?string
+    {
+        // Verifica se o arquivo existe e se tem um nome
+        $arquivo = $this->file($chave);
+
+        if (!$arquivo || !isset($arquivo['name'])) {
+            return null;
+        }
+
+        // Retorna o nome do arquivo
+        return $arquivo['name'];
+    }
+
+    /**
+     * Obtém o caminho temporário do arquivo enviado
+     *
+     * @param string $chave
+     * @return string|null
+     */
+    public function obterCaminhoTemporarioArquivo(string $chave): ?string
+    {
+        // Verifica se o arquivo existe e se tem um caminho temporário
+        $arquivo = $this->file($chave);
+
+        if (!$arquivo || !isset($arquivo['tmp_name'])) {
+            return null;
+        }
+
+        // Retorna o caminho temporário do arquivo
+        return $arquivo['tmp_name'];
+    }
+
+    /**
+     * Sanitiza os dados recebidos da requisição
+     *
+     * @param mixed $dados
+     * @return mixed
+     */
     private function sanitizar(mixed $dados): mixed
     {
+        // Verifica se os dados são um array ou uma string
         if (is_array($dados)) {
+
+            // Sanitiza cada elemento do array
             return array_map([$this, 'sanitizar'], $dados);
         }
+
+        // Sanitiza a string
         if (!is_string($dados)) {
             return $dados;
         }
+
+        // Remove tags HTML e espaços em branco
         return strip_tags(trim($dados));
     }
 }

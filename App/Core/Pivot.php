@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @file Model.php
- * @description Classe-base para todos os "models" do sistema, responsável pela comunicação com o banco de dados.
+ * @file Pivot.php
+ * @description Classe-base para todas as tabelas "pivôs" do sistema, responsável pela comunicação com o banco de dados.
  * @author Thiago Moreira
- * @copyright Copright (c) 2025
+ * @copyright Copyright (c) 2025
  */
 
 // Declaração de namespace
@@ -12,19 +12,16 @@ namespace App\Core;
 
 // Importação de classes
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Database\Eloquent\Relations\Pivot as EloquentPivot;
 
 /**
- * Classe Model (abstrata)
- *
- * Gerencia a comunicação com o banco de dados
+ * Classe Pivot
  *
  * @package App\Core
  * @abstract
  */
-abstract class Model extends EloquentModel
+abstract class Pivot extends EloquentPivot
 {
-
     // --- ATRIBUTOS ---
 
     /**
@@ -58,7 +55,7 @@ abstract class Model extends EloquentModel
     protected $fillable = []; // (padrão do Eloquent ORM)
 
     /**
-     * Os atributos que devem ser ocultados ao serializar o modelo (converter para array ou JSON)
+     * Os atributos que devem ser ocultados ao serializar o pivô (converter para array ou JSON)
      * @var array
      */
     protected $hidden = []; // (padrão do Eloquent ORM)
@@ -73,18 +70,18 @@ abstract class Model extends EloquentModel
     // --- MÉTODOS ---
 
     /**
-     * Função-base para criar um registro no modelo do banco de dados
+     * Função-base para criar um registro no pivô do banco de dados
      *
      * @param array $dados
-     * @return Model
+     * @return Pivot
      */
-    public function criar(array $dados): Model
+    public function criar(array $dados): Pivot
     {
         return $this->create($dados);
     }
 
     /**
-     * Função-base para atualizar um registro no modelo do banco de dados
+     * Função-base para atualizar um registro no pivô do banco de dados
      *
      * @param array $dados
      * @return bool
@@ -95,7 +92,7 @@ abstract class Model extends EloquentModel
     }
 
     /**
-     * Função-base para salvar todas as alterações feitas no registro do modelo no banco de dados
+     * Função-base para salvar todas as alterações feitas no registro do pivô no banco de dados
      *
      * @return bool
      */
@@ -105,7 +102,7 @@ abstract class Model extends EloquentModel
     }
 
     /**
-     * Função-base para excluir um registro do modelo no banco de dados
+     * Função-base para excluir um registro do pivô no banco de dados
      *
      * @return bool
      */
@@ -137,9 +134,9 @@ abstract class Model extends EloquentModel
     /**
      * Função-base para obter o primeiro registro (ou sem registros) encontrado
      *
-     * @return Model|null
+     * @return ?Pivot
      */
-    public static function obterPrimeiro(): ?Model
+    public function obterPrimeiro(): ?Pivot
     {
         return parent::first();
     }
@@ -148,15 +145,15 @@ abstract class Model extends EloquentModel
      * Função-base para encontrar um registro com base no ID
      *
      * @param int $id
-     * @return Model|null
+     * @return ?Pivot
      */
-    public static function buscarPorId(int $id): ?Model
+    public function encontrar(int $id): ?Pivot
     {
         return parent::find($id);
     }
 
     /**
-     * Função-base para retornar o total de registros de um modelo
+     * Função-base para retornar o total de registros de um pivô
      *
      * @return int
      */
