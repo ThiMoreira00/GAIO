@@ -13,6 +13,7 @@ namespace App\Core;
 // Importação de classes
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use UnitEnum;
 
 /**
  * Classe Model (abstrata)
@@ -131,8 +132,76 @@ abstract class Model extends EloquentModel
      */
     public function obterDados(): array
     {
-        return $this->toArray();
+        $dados = [];
+        
+        // Percorre todos os atributos do modelo
+        foreach ($this->getAttributes() as $key => $value) {
+            // Verifica se existe um cast para este atributo
+            if (isset($this->casts[$key])) {
+                $castType = $this->casts[$key];
+                
+                // Verifica se é um enum (classe que existe e é enum)
+                if (class_exists($castType) && enum_exists($castType)) {
+                    // Remove espaços extras do valor antes de tentar converter
+                    $cleanValue = is_string($value) ? trim($value) : $value;
+                    
+                    // Tenta obter o enum através do valor limpo
+                    try {
+                        $enumValue = null;
+                        
+                        // Primeiro tenta pelo value (tryFrom)
+                        if (method_exists($castType, 'tryFrom')) {
+                            $enumValue = $castType::tryFrom($cleanValue);
+                        }
+                        
+                        // Se não encontrou, tenta pelo name
+                        if ($enumValue === null && method_exists($castType, 'fromName')) {
+                            $enumValue = $castType::fromName($cleanValue);
+                        }
+                        
+                        // Se ainda não encontrou, tenta buscar manualmente
+                        if ($enumValue === null) {
+                            foreach ($castType::cases() as $case) {
+                                // Verifica se o valor do banco corresponde ao name do enum
+                                if ($case->name === $cleanValue) {
+                                    $enumValue = $case;
+                                    break;
+                                }
+                                // Verifica se o valor do banco corresponde ao value do enum
+                                if ($case instanceof \BackedEnum && $case->value === $cleanValue) {
+                                    $enumValue = $case;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if ($enumValue instanceof \UnitEnum) {
+                            $dados[$key] = [
+                                'name' => $enumValue->name,
+                                'value' => $enumValue instanceof \BackedEnum ? $enumValue->value : $enumValue->name
+                            ];
+                            continue;
+                        }
+                    } catch (\ValueError $e) {
+                        // Se falhar, usa o valor original
+                        $dados[$key] = $cleanValue;
+                        continue;
+                    }
+                }
+            }
+            
+            // Para não-enums, usa o valor original
+            $dados[$key] = $value;
+        }
+        
+        // Adiciona os relacionamentos carregados
+        foreach ($this->getRelations() as $key => $value) {
+            $dados[$key] = $value;
+        }
+        
+        return $dados;
     }
+
 
     /**
      * Função-base para obter o primeiro registro (ou sem registros) encontrado
