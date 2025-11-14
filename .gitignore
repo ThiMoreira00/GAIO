@@ -1,4 +1,5 @@
 .env
 .idea/
-vendor/
+archived/
 node_modules/
+vendor/
