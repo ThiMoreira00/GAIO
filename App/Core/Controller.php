@@ -103,10 +103,10 @@ abstract class Controller
      * @param string $url
      * @return never
      */
-    protected function redirecionar(string $url): never
+    protected function redirecionar(string $url, int $codigoStatus = 200): never
     {
         // Delega o redirecionamento para a classe Response
-        Response::redirecionar($url);
+        Response::redirecionar($url, $codigoStatus);
     }
 
     /**

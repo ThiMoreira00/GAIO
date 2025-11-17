@@ -337,6 +337,9 @@ abstract class Router
     private static function enviarErro(int $codigoHTTP, string $mensagem): void
     {
         http_response_code($codigoHTTP);
-        Response::renderizar("erros/erro-{$codigoHTTP}", ['mensagem' => $mensagem]);
+        
+        // Renderiza e exibe a página de erro
+        echo Response::renderizar("erros/erro-{$codigoHTTP}", ['mensagem' => $mensagem]);
+        exit;
     }
 }

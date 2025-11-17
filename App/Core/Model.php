@@ -177,8 +177,8 @@ abstract class Model extends EloquentModel
                         
                         if ($enumValue instanceof \UnitEnum) {
                             $dados[$key] = [
-                                'name' => $enumValue->name,
-                                'value' => $enumValue instanceof \BackedEnum ? $enumValue->value : $enumValue->name
+                                'nome' => $enumValue->name,
+                                'valor' => $enumValue instanceof \BackedEnum ? $enumValue->value : $enumValue->name
                             ];
                             continue;
                         }

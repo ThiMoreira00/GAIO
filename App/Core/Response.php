@@ -30,11 +30,38 @@ abstract class Response
      * Define o código de status da resposta HTTP
      *
      * @param int $codigo
+     * @param bool $renderizarErroHtml
      * @return void
      */
-    public static function atribuirCodigoStatus(int $codigo): void
+    public static function atribuirCodigoStatus(int $codigo, bool $renderizarErroHtml = true): void
     {
         http_response_code($codigo);
+        
+        // Se for um código de erro e deve renderizar HTML, renderiza a página de erro correspondente
+        if ($codigo >= 400 && $renderizarErroHtml) {
+            self::renderizarErro($codigo);
+        }
+    }
+
+    /**
+     * Renderiza a página de erro correspondente ao código de status
+     *
+     * @param int $codigo
+     * @return never
+     */
+    private static function renderizarErro(int $codigo): never
+    {
+        $caminhoErro = __DIR__ . "/../../resources/views/erros/erro-{$codigo}.php";
+        
+        // Verifica se existe uma página de erro específica para este código
+        if (file_exists($caminhoErro)) {
+            echo self::renderizar("erros/erro-{$codigo}");
+        } else {
+            // Se não existir, renderiza uma página de erro genérica
+            echo self::renderizar("erros/erro-generico", ['codigo' => $codigo]);
+        }
+        
+        exit;
     }
 
     /**
@@ -46,7 +73,7 @@ abstract class Response
      */
     public static function json(array $dados, int $codigoStatus = 200): never
     {
-        self::atribuirCodigoStatus($codigoStatus);
+        self::atribuirCodigoStatus($codigoStatus, false); // Não renderiza erro HTML para JSON
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($dados);
         exit;
@@ -58,8 +85,9 @@ abstract class Response
      * @param string $url
      * @return never
      */
-    public static function redirecionar(string $url): never
+    public static function redirecionar(string $url, int $codigoStatus = 200): never
     {
+        self::atribuirCodigoStatus($codigoStatus, false); // Não renderiza erro para redirecionamentos
         header("Location: {$url}");
         exit;
     }
@@ -83,7 +111,7 @@ abstract class Response
             $caminhoCompleto = __DIR__ . "/../../resources/views/{$caminhoView}.php";
 
             if (!file_exists($caminhoCompleto)) {
-                self::atribuirCodigoStatus(500);
+                http_response_code(500);
                 throw new Exception("Visualização '{$caminhoView}' não encontrada.");
             }
 
@@ -112,8 +140,8 @@ abstract class Response
         } catch (Exception $exception) {
 
             // Lógica para tratamento de erros
-            self::atribuirCodigoStatus(500);
-            self::renderizar('erros/erro-500', ['mensagem' => $exception->getMessage()]);
+            http_response_code(500);
+            echo self::renderizar('erros/erro-500', ['mensagem' => $exception->getMessage()]);
             exit;
         }
     }
