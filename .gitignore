@@ -3,3 +3,4 @@
 archived/
 node_modules/
 vendor/
+storage/*
