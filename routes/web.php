@@ -62,33 +62,29 @@ Router::grupo(['middleware' => new AutenticacaoMiddleware()], function (): void 
     // Rotas para administrador
     Router::grupo(['middleware' => new ControleAcessoMiddleware('ADMINISTRADOR')], function (): void {
         
+        // Rotas para requisições AJAX
         Router::grupo(['middleware' => new AjaxMiddleware()], function (): void {
-            Router::get('/grupos/{id}/permissoes/obter', 'GrupoController@obterPermissoes', ['id' => '[0-9]+']);
 
+            # Grupos de Permissão
+            Router::get('/grupos/{id}/permissoes/obter', 'GrupoController@obterPermissoes', ['id' => '[0-9]+']);
             Router::get('/grupos/{id}/membros/obter', 'GrupoController@obterMembros', ['id' => '[0-9]+']);
             Router::get('/grupos/{id}/membros/disponiveis', 'GrupoController@obterMembrosDisponiveis', ['id' => '[0-9]+']);
-
-            Router::get('/grupos/{id}/obter', 'GrupoController@obterGrupo', ['id' => '[0-9]+']);;
+            Router::get('/grupos/{id}/obter', 'GrupoController@obterGrupo', ['id' => '[0-9]+']);
             Router::get('/grupos/obter', 'GrupoController@obterGrupos');
-
             Router::post('/grupos/permissoes/salvar', 'GrupoController@salvarPermissoes');
             Router::post('/grupos/criar', 'GrupoController@criarGrupo');
             Router::post('/grupos/{id}/excluir', 'GrupoController@excluirGrupo', ['id' => '[0-9]+']);
             Router::post('/grupos/{id}/membros/adicionar', 'GrupoController@adicionarMembros', ['id' => '[0-9]+']);
-
             Router::post('/grupos/{grupoId}/membros/{membroId}/remover', 'GrupoController@removerMembro', ['grupoId' => '[0-9]+', 'membroId' => '[0-9]+']);
-
 
             # Cursos
             Router::get('/cursos/obter', 'CursoController@obterCursos');
             Router::get('/cursos/{id}/obter', 'CursoController@obterCurso', ['id' => '[0-9]+']);
             Router::get('/cursos/filtrar', 'CursoController@filtrarCursos');
-
             Router::post('/cursos/adicionar', 'CursoController@adicionarCurso');
             Router::post('/cursos/{id}/editar', 'CursoController@editarCurso', ['id' => '[0-9]+']);
             Router::post('/cursos/{id}/arquivar', 'CursoController@arquivarCurso', ['id' => '[0-9]+']);
             // Router::post('/cursos/{id}/reativar', 'CursoController@reativarCurso', ['id' => '[0-9]+']);
-
 
             # Usuários
             Router::get('/usuarios/buscar', 'UsuarioController@buscarUsuarios');
@@ -102,39 +98,43 @@ Router::grupo(['middleware' => new AutenticacaoMiddleware()], function (): void 
             Router::post('/espacos/adicionar', 'EspacoController@adicionarEspaco');
             Router::post('/espacos/{id}/editar', 'EspacoController@editarEspaco', ['id' => '[0-9]+']);
             Router::post('/espacos/{id}/arquivar', 'EspacoController@arquivarEspaco', ['id' => '[0-9]+']);
+            Router::post('/espacos/{id}/reativar', 'EspacoController@reativarEspaco', ['id' => '[0-9]+']);
             Router::post('/espacos/{id}/excluir', 'EspacoController@excluirEspaco', ['id' => '[0-9]+']);
 
             # Alunos
             Router::get('/alunos/filtrar', 'AlunoController@filtrarAlunos');
             Router::post('/alunos/adicionar', 'AlunoController@adicionarAluno');
+            Router::post('/alunos/importar-sisu', 'AlunoController@importarSisu');
+            Router::get('/alunos/template-sisu', 'AlunoController@baixarTemplateSisu');
 
         });
 
+        # Grupos de Permissão
         Router::get('/grupos/permissoes', 'GrupoController@exibirPermissoes');
         Router::get('/grupos/membros', 'GrupoController@exibirMembros');
         Router::get('/usuarios', 'UsuarioController@exibirIndex');
 
-        // Cursos
+        # Cursos
         Router::get('/cursos', 'CursoController@exibirIndex');
         Router::get('/cursos/visualizar/{id}-{nome}', 'CursoController@exibirCurso', ['id' => '[0-9]+', 'nome' => '[a-zA-Z0-9\%][a-zA-Z0-9\-\%]*']);
 
-        // Espaços
+        # Espaços
         Router::get('/espacos', 'EspacoController@exibirIndex');
 
-        // Períodos Letivos
+        # Períodos Letivos
         Router::get('/periodos', 'PeriodoController@exibirIndex');
         Router::get('/periodos/{id}', 'PeriodoController@exibirPeriodo', ['id' => '[0-9]+']);
 
-        // Alunos
+        # Alunos
         Router::get('/alunos', 'AlunoController@exibirIndex');
         
-        // Matrizes Curriculares [TESTE]
+        # Matrizes Curriculares
         Router::get('/matrizes', 'MatrizCurricularController@exibirIndex');
 
-        // Logs
+        # Logs
         Router::get('/logs', 'LogController@exibirIndex');
         
-        // Rotas AJAX para espaços
+        # Rotas AJAX para espaços
         Router::grupo(['middleware' => new AjaxMiddleware()], function (): void {
             Router::get('/espacos/{id}/dados', 'EspacoController@obterDados', ['id' => '[0-9]+']);
         });
