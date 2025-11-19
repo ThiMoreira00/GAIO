@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file Router.php
  * @description Classe-base para controle de todos os roteamentos do sistema, responsável por mapear e despachar as requisições.
@@ -69,8 +71,8 @@ abstract class Router
         }
 
         // Remove arrays vazios que podem ter sido criados
-        $middlewaresGrupo = array_filter($middlewaresGrupo);
-        $middlewaresRota = array_filter($middlewaresRota);
+        $middlewaresGrupo = array_filter($middlewaresGrupo, fn($item) => $item !== null && $item !== '');
+        $middlewaresRota = array_filter($middlewaresRota, fn($item) => $item !== null && $item !== '');
 
         // Mescla os middlewares do grupo e da rota
         $middlewares = array_merge($middlewaresGrupo, $middlewaresRota);
@@ -168,8 +170,8 @@ abstract class Router
         }
 
         // Remove arrays vazios que podem ter sido criados
-        $middlewaresAnteriores = array_filter($middlewaresAnteriores);
-        $middlewaresGrupoAtual = array_filter($middlewaresGrupoAtual);
+        $middlewaresAnteriores = array_filter($middlewaresAnteriores, fn($item) => $item !== null && $item !== '');
+        $middlewaresGrupoAtual = array_filter($middlewaresGrupoAtual, fn($item) => $item !== null && $item !== '');
 
         // Mescla os middlewares anteriores com os do grupo atual
         $opcoes['middleware'] = array_merge($middlewaresAnteriores, $middlewaresGrupoAtual);

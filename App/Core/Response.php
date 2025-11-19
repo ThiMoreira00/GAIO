@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file Response.php
  * @description Classe-base para todos os "responses" do sistema, responsável por todas as respostas e visualizações para serem exibidas ao cliente.
@@ -41,27 +43,6 @@ abstract class Response
         if ($codigo >= 400 && $renderizarErroHtml) {
             self::renderizarErro($codigo);
         }
-    }
-
-    /**
-     * Renderiza a página de erro correspondente ao código de status
-     *
-     * @param int $codigo
-     * @return never
-     */
-    private static function renderizarErro(int $codigo): never
-    {
-        $caminhoErro = __DIR__ . "/../../resources/views/erros/erro-{$codigo}.php";
-        
-        // Verifica se existe uma página de erro específica para este código
-        if (file_exists($caminhoErro)) {
-            echo self::renderizar("erros/erro-{$codigo}");
-        } else {
-            // Se não existir, renderiza uma página de erro genérica
-            echo self::renderizar("erros/erro-generico", ['codigo' => $codigo]);
-        }
-        
-        exit;
     }
 
     /**
@@ -144,5 +125,26 @@ abstract class Response
             echo self::renderizar('erros/erro-500', ['mensagem' => $exception->getMessage()]);
             exit;
         }
+    }
+
+    /**
+     * Renderiza a página de erro correspondente ao código de status
+     *
+     * @param int $codigo
+     * @return never
+     */
+    private static function renderizarErro(int $codigo): never
+    {
+        $caminhoErro = __DIR__ . '/../../resources/views/erros/erro-' . $codigo . '.php';
+        
+        // Verifica se existe uma página de erro específica para este código
+        if (file_exists($caminhoErro)) {
+            echo self::renderizar('erros/erro-' . $codigo);
+        } else {
+            // Se não existir, renderiza uma página de erro genérica
+            echo self::renderizar('erros/erro-generico', ['codigo' => $codigo]);
+        }
+        
+        exit;
     }
 }

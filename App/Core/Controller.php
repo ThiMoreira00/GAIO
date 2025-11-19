@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file Controller.php
  * @description Classe-base para todos os "controllers" do sistema, responsável pelo fluxo de requisições.

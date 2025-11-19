@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Core\Router;
 use App\Middlewares\AjaxMiddleware;
 use App\Middlewares\AutenticacaoMiddleware;
@@ -138,14 +140,7 @@ Router::grupo(['middleware' => new AutenticacaoMiddleware()], function (): void 
         Router::grupo(['middleware' => new AjaxMiddleware()], function (): void {
             Router::get('/espacos/{id}/dados', 'EspacoController@obterDados', ['id' => '[0-9]+']);
         });
-        
-
     });
-
-
-
 });
-
-
 
 Router::despachar();

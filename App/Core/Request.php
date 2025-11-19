@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file Request.php
  * @description Classe-base para todos os "requests" do sistema, responsável pelas requisições com base no roteamento.
@@ -24,31 +26,31 @@ class Request
 
     /**
      * Parâmetros GET da requisição
-     * @var array|mixed 
+     * @var array<string, string|int>
      */
     private array $parametrosGET;
 
     /**
      * Parâmetros POST da requisição
-     * @var array|mixed 
+     * @var array<string, string|int>
      */
     private array $parametrosPOST;
 
     /**
      * Parâmetros do servidor da requisição
-     * @var array 
+     * @var array<string, string>
      */
     private array $parametrosSERVER;
 
     /**
      * Parâmetros da rota da requisição
-     * @var array|mixed
+     * @var array<string, string|int>
      */
     private array $parametrosRota;
     
     /**
      * Parâmetros de arquivos da requisição
-     * @var array|mixed
+     * @var array<string, array<string, mixed>>
      */
     private array $parametrosFILES;
 
@@ -98,10 +100,10 @@ class Request
      * Obtém um parâmetro da requisição GET
      *
      * @param string $chave
-     * @param $default
-     * @return mixed|null
+     * @param string|int|null $default
+     * @return string|int|null
      */
-    public function get(string $chave, $default = null): mixed
+    public function get(string $chave, string|int|null $default = null): string|int|null
     {
         return $this->parametrosGET[$chave] ?? $default;
     }
@@ -110,10 +112,10 @@ class Request
      * Obtém um parâmetro da requisição POST
      *
      * @param string $chave
-     * @param $default
-     * @return mixed|null
+     * @param string|int|null $default
+     * @return string|int|null
      */
-    public function post(string $chave, $default = null): mixed
+    public function post(string $chave, string|int|null $default = null): string|int|null
     {
         return $this->parametrosPOST[$chave] ?? $default;
     }
@@ -122,10 +124,10 @@ class Request
      * Obtém um parâmetro de arquivo da requisição
      *
      * @param string $chave
-     * @param $default
-     * @return mixed|null
+     * @param array<string, mixed>|null $default
+     * @return array<string, mixed>|null
      */
-    public function file(string $chave, $default = null): mixed
+    public function file(string $chave, ?array $default = null): ?array
     {
         return $this->parametrosFILES[$chave] ?? $default;
     }
@@ -154,10 +156,10 @@ class Request
      * Obtém um parâmetro da rota da requisição
      *
      * @param string $chave
-     * @param $default
-     * @return mixed|null
+     * @param string|int|null $default
+     * @return string|int|null
      */
-    public function parametroRota(string $chave, $default = null): mixed
+    public function parametroRota(string $chave, string|int|null $default = null): string|int|null
     {
         return $this->parametrosRota[$chave] ?? $default;
     }
@@ -176,10 +178,10 @@ class Request
      * Obtém um parâmetro do servidor da requisição
      *
      * @param string $chave
-     * @param $default
-     * @return mixed|null
+     * @param string|null $default
+     * @return string|null
      */
-    public function server(string $chave, $default = null): mixed
+    public function server(string $chave, ?string $default = null): ?string
     {
         return $this->parametrosSERVER[$chave] ?? $default;
     }
@@ -326,10 +328,10 @@ class Request
     /**
      * Sanitiza os dados recebidos da requisição
      *
-     * @param mixed $dados
-     * @return mixed
+     * @param array<mixed>|string|int|null $dados
+     * @return array<mixed>|string|int|null
      */
-    private function sanitizar(mixed $dados): mixed
+    private function sanitizar(array|string|int|null $dados): array|string|int|null
     {
         // Verifica se os dados são um array ou uma string
         if (is_array($dados)) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file Pivot.php
  * @description Classe-base para todas as tabelas "pivôs" do sistema, responsável pela comunicação com o banco de dados.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @file Model.php
  * @description Classe-base para todos os "models" do sistema, responsável pela comunicação com o banco de dados.
