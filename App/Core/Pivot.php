@@ -110,7 +110,7 @@ abstract class Pivot extends EloquentPivot
      */
     public function excluir(): bool
     {
-        return $this->delete();
+        return (bool) $this->delete();
     }
 
     /**
