@@ -1,0 +1,490 @@
+@import "tailwindcss";
+
+
+@theme {
+    --color-primary: #176AB5;
+    --color-primary-50: #F2F8FD;
+    --color-primary-100: #E3EEFB;
+    --color-primary-200: #C1DDF6;
+    --color-primary-300: #8AC0EF;
+    --color-primary-400: #4CA1E4;
+    --color-primary-500: #2585D2;
+    --color-primary-600: #176AB5;
+    --color-primary-700: #145390;
+    --color-primary-800: #144878;
+    --color-primary-900: #163D64;
+    --color-primary-950: #0F2742;
+    --color-secondary: #011627;
+    --color-terciary: #A0D9F8;
+    --color-quaternary: #F2FAFF;
+}
+
+@layer components {
+    .required::after {
+        content: " *";
+        color: red;
+        margin-left: 0.25rem;
+    }
+}
+
+/* src/input.css */
+@tailwind utilities;
+
+@layer components {
+
+    .breadcrumbs-item {
+        @apply ml-2 text-sm font-medium text-gray-500;
+        @apply hover:text-gray-700;
+    }
+
+    .main-content {
+        @apply sm:w-full lg:w-auto px-4 py-10 sm:px-6 flex-1 p-4 sm:p-6 lg:p-8 lg:ml-72;
+    }
+
+    /* Componente para o menu lateral */
+    /*.sidebar-menu {*/
+    /*    @apply fixed inset-y-0 left-0 z-40 flex w-72 flex-col bg-white border-r border-gray-200 px-6 pb-4 overflow-y-auto lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-lg sm:shadow-none sm:-translate-x-full;*/
+    /*}*/
+    .sidebar-menu {
+        @apply fixed inset-y-0 left-0 z-40 flex w-72 flex-col bg-white border-r border-gray-200 px-4 sm:px-6 pb-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-lg sm:shadow-none;
+    }
+
+    .sidebar-header {
+        @apply flex h-16 shrink-0 items-center justify-between my-4;
+    }
+
+    .sidebar-button-close {
+        @apply md:hidden p-2 -mr-2 text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500 rounded;
+    }
+
+    .sidebar-category {
+        @apply text-xs font-semibold leading-6 text-gray-500 px-2;
+    }
+
+    /* Componente para labels */
+    .form-label {
+        @apply block text-sm font-medium text-gray-800;
+    }
+
+    /* Componente para inputs de texto e email */
+    .form-input {
+        @apply block w-full px-3 py-2 bg-white border border-gray-300 rounded-md;
+        @apply placeholder-gray-400;
+        @apply focus:outline-none focus:ring-sky-500 focus:border-sky-500 focus:border-1;
+
+        /* Estilos para estado desabilitado */
+        @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
+
+        /* Estilos para estado de leitura somente */
+        @apply read-only:bg-gray-100 read-only:text-gray-500 read-only:cursor-default;
+    }
+
+    /* Componente para selects */
+    .form-select {
+        @apply block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md bg-white;
+        @apply focus:outline-none focus:ring-sky-500 focus:border-sky-500;
+
+        /* Estilos para estado desabilitado */
+        @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
+    }
+
+    /* Componente para checkboxes */
+    .form-checkbox {
+        @apply h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500;
+        @apply focus:ring-2 focus:ring-offset-2 focus:ring-sky-500;
+
+        /* Estilos para estado desabilitado */
+        @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
+    }
+
+    /* Componente para links */
+    /*.form-link {*/
+    /*    @apply font-semibold text-sky-800 hover:text-sky-900 hover:underline;*/
+    /*}*/
+
+    .form-link {
+        @apply font-semibold text-sky-500 hover:text-sky-600 underline;
+    }
+
+    /* Componente para o botão principal */
+    .button-primary {
+        @apply px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-white bg-sky-600 text-sm;
+        @apply hover:bg-sky-700;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500;
+        @apply disabled:bg-sky-200 disabled:cursor-not-allowed;
+    }
+
+    .input-search {
+        @apply block w-full rounded-lg border-0 py-2.5 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm;
+    }
+
+    /* Componente para o botão secundário */
+    /*.button-secondary {*/
+    /*    @apply px-6 py-2 border border-transparent rounded-md shadow-sm font-medium text-sky-600 bg-white text-sm;*/
+    /*    @apply hover:bg-gray-50;*/
+    /*    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500;*/
+    /*    @apply disabled:bg-gray-100 disabled:cursor-not-allowed;*/
+    /*    @apply disabled:text-gray-500;*/
+    /*    @apply disabled:border-gray-300;*/
+    /*}*/
+
+    /*.button-secondary {*/
+    /*    @apply px-6 py-2 border border-transparent rounded-md shadow-sm font-medium text-sky-600 bg-white text-sm; !* talvez alterar as cores text-sky e bg-white para cinza? *!*/
+    /*    @apply hover:bg-gray-50;*/
+    /*    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500; !* talvez alterar a cor de focus para cinza? *!*/
+    /*    @apply disabled:bg-gray-100 disabled:cursor-not-allowed; !* talvez alterar a cor de disabled para cinza? *!*/
+    /*}*/
+
+    /** ===========================================
+        BOTÕES
+    ===========================================*/
+
+    .button-primary,
+    .button-secondary,
+    .button-danger,
+    .button-warning,
+    .button-green,
+    .button-yellow,
+    .button-gray-transparent,
+    .button-success {
+        @apply inline-flex items-center justify-center gap-2;
+    }
+
+    .button-secondary {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm font-medium bg-white text-sm text-gray-700;
+        @apply hover:bg-gray-50;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500;
+        @apply disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500 disabled:border-gray-300;
+    }
+
+    .button-danger {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-white bg-red-600 text-sm;
+        @apply hover:bg-red-700;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500;
+        @apply disabled:bg-red-400 disabled:cursor-not-allowed;
+    }
+
+    .button-warning {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-white bg-yellow-500 text-sm;
+        @apply hover:bg-yellow-600;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500;
+        @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+    }
+
+    .button-green {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-white bg-green-600 text-sm;
+        @apply hover:bg-green-700;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+        @apply disabled:bg-green-400 disabled:cursor-not-allowed;
+    }
+
+    .button-yellow {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-white bg-yellow-500 text-sm;
+        @apply hover:bg-yellow-600;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500;
+        @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+    }
+
+    .button-gray-transparent {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-gray-700 bg-gray-100 text-sm;
+        @apply hover:bg-gray-200;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500;
+        @apply disabled:bg-gray-300 disabled:cursor-not-allowed;
+    }
+
+    .button-success {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm font-medium text-white bg-green-600 text-sm;
+        @apply hover:bg-green-700;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+        @apply disabled:bg-green-400 disabled:cursor-not-allowed;
+    }
+
+    .container {
+        @apply bg-white p-8 border-b border-gray-200 min-h-max;
+    }
+
+}
+
+/**
+* ==================================================
+* SIDEBAR
+* ==================================================
+*/
+
+@layer components {
+
+    .sidebar-item {
+        @apply text-gray-700 hover:text-sky-700 hover:bg-sky-50;
+        @apply hover:text-sky-700;
+        @apply flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6;
+    }
+
+    .sidebar-item-active {
+        @apply bg-sky-100 text-sky-700;
+        @apply group-hover:text-sky-700;
+        @apply flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6;
+    }
+
+    .sidebar-subitem {
+        @apply text-gray-600 hover:text-sky-700 hover:bg-sky-50;
+        @apply hover:text-sky-700;
+        @apply flex items-center gap-x-3 rounded-md p-2 pl-4 text-sm font-medium leading-6;
+    }
+
+    .sidebar-subitem-active {
+        @apply bg-sky-100 text-sky-700;
+        @apply group-hover:text-sky-700;
+        @apply flex items-center gap-x-3 rounded-md p-2 pl-4 text-sm font-medium leading-6;
+    }
+
+}
+
+
+/** ==================================================
+* TAB
+* ==================================================
+*/
+
+@layer components {
+
+    .tab-item {
+        @apply px-5 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-200;
+    }
+
+    .tab-item.active {
+        @apply px-5 py-2 rounded-full text-sm font-medium bg-white text-sky-600 shadow-sm;
+    }
+
+}
+
+/** ==================================================
+* BADGES
+* ==================================================
+*/
+
+@layer components {
+
+    .badge {
+        @apply text-xs font-bold inline-flex items-center px-3 py-1 rounded-full uppercase;
+    }
+
+    .badge-green {
+        @apply bg-green-100 text-green-800;
+    }
+
+    .badge-yellow {
+        @apply bg-yellow-100 text-yellow-800;
+    }
+
+    .badge-red {
+        @apply bg-red-100 text-red-800;
+    }
+
+    .badge-blue {
+        @apply bg-blue-100 text-blue-800;
+    }
+
+    .badge-purple {
+        @apply bg-purple-100 text-purple-800;
+    }
+
+    .badge-gray {
+        @apply bg-gray-200 text-gray-800;
+    }
+
+}
+
+@layer components {
+    .fluxograma-canvas {
+        @apply relative w-full min-h-[28rem] bg-slate-50 border border-gray-200 rounded-2xl p-6 sm:p-8 overflow-hidden isolate shadow-inner;
+    }
+
+    .fluxograma-canvas-legend {
+        @apply mt-4 flex flex-wrap gap-4 text-sm text-gray-600;
+    }
+
+    .fluxograma-grid {
+        @apply grid grid-cols-1 gap-6 lg:grid-cols-3 xl:lg:grid-cols-3;
+    }
+
+    .fluxo-board {
+        @apply flex flex-row flex-wrap gap-4 pb-6 items-stretch min-h-[24rem] relative;
+    }
+
+    .fluxo-board-horizontal {
+        @apply flex-col overflow-x-hidden overflow-y-auto max-h-[60vh];
+    }
+
+    .fluxo-periodo {
+        @apply relative w-64 flex-none flex flex-col bg-white border border-gray-200 rounded-xl shadow-xl shadow-slate-900/10 overflow-hidden z-10;
+    }
+
+    .fluxo-periodo-header {
+        @apply flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-200 bg-gradient-to-br from-slate-50 to-white;
+    }
+
+    .fluxo-periodo-list {
+        @apply flex flex-col gap-3 p-4 overflow-y-auto min-h-[11rem] bg-gradient-to-b from-slate-50/80 via-white/95 to-white/70;
+    }
+
+    .fluxo-card,
+    .subject-card {
+        @apply relative z-20 bg-white rounded-xl border border-gray-200 p-4 shadow-lg shadow-slate-900/20 transition duration-200 ease-out cursor-pointer;
+    }
+
+    .fluxo-card:hover,
+    .subject-card:hover {
+        @apply -translate-y-0.5 border-sky-300 shadow-2xl shadow-sky-900/20;
+    }
+
+    .fluxo-card-badge {
+        @apply inline-flex items-center gap-1 text-[0.62rem] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full;
+    }
+
+    .fluxo-card-info {
+        @apply flex justify-between text-[0.7rem] text-gray-500 mt-2;
+    }
+
+    .fluxo-card-titulo {
+        @apply text-sm font-semibold text-gray-900 leading-tight mt-2;
+    }
+
+    .fluxo-legenda-equivalencia {
+        background-image: linear-gradient(to right, #eab308 50%, transparent 50%);
+        background-size: 8px 2px;
+    }
+
+    .drop-zone {
+        @apply transition-all duration-200 min-h-[12rem] bg-gradient-to-b from-slate-50/80 via-white/95 to-white/70 rounded-lg border border-transparent;
+    }
+
+    .drop-zone.is-active-drop {
+        @apply bg-sky-50 border border-dashed border-sky-500;
+    }
+
+    .subject-card.is-dragging {
+        @apply opacity-60 scale-[0.98] rotate-1 shadow-xl shadow-slate-900/30;
+    }
+
+    .fluxo-periodo-list::-webkit-scrollbar,
+    .fluxo-board::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .fluxo-periodo-list::-webkit-scrollbar-thumb,
+    .fluxo-board::-webkit-scrollbar-thumb {
+        background-color: rgba(148, 163, 184, 0.55);
+        border-radius: 999px;
+    }
+
+    .fluxo-periodo[data-empty="true"] .fluxo-periodo-list::after {
+        content: "Sem componentes";
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .leader-line {
+        z-index: 5 !important;
+        pointer-events: none;
+    }
+
+    #matrix-board-container {
+        isolation: isolate;
+    }
+
+    #matrix-board {
+        scroll-behavior: smooth;
+    }
+
+    #matrix-board::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    #matrix-board::-webkit-scrollbar-thumb {
+        background-color: rgba(148, 163, 184, 0.6);
+        border-radius: 999px;
+    }
+}
+
+/** ==================================================
+* CALENDÁRIO (HORA)
+* ==================================================
+*/
+
+@layer components {
+
+    /* --- Container do Calendário --- */
+    .mini-calendar-container {
+        @apply w-full bg-white border border-gray-200 rounded-lg shadow-sm mt-6 relative h-[600px] overflow-y-auto;
+    }
+
+    .calendar-table {
+        @apply min-w-full border-collapse text-sm;
+    }
+
+    /* --- Header (Cabeçalho Fixo) --- */
+    .calendar-thead {
+        @apply bg-white;
+    }
+
+    .calendar-thead th {
+        @apply sticky top-0 bg-white border-b border-gray-200 p-4 text-center font-semibold text-gray-900 shadow-sm z-20 w-32;
+    }
+
+    .th-corner {
+        @apply sticky left-0 z-30 w-20 border-r border-gray-200 bg-white;
+    }
+
+    /* --- Estilos dos Dias --- */
+    .day-label {
+        @apply flex flex-col items-center justify-center;
+    }
+
+    .day-name {
+        @apply text-gray-500 text-xs uppercase tracking-wide;
+    }
+
+    .day-number {
+        @apply text-lg mt-1 h-8 w-8 flex items-center justify-center rounded-full;
+    }
+
+    .day-number.active {
+        @apply bg-indigo-600 text-white font-bold;
+    }
+
+    /* --- Corpo da Tabela --- */
+    .calendar-tbody tr {
+        @apply border-b border-gray-100 last:border-none;
+    }
+
+    /* Coluna de Horário (Sticky Left) */
+    .td-time {
+        @apply sticky left-0 z-10 w-20 bg-white border-r border-gray-200 text-right pr-4 py-2 text-xs font-medium text-gray-400 align-top;
+    }
+
+    /* Slots de Conteúdo */
+    .td-slot {
+        @apply border-r border-gray-100 p-1 align-top relative h-12 transition-colors hover:bg-gray-50 w-32;
+    }
+
+    /* --- Cards de Eventos --- */
+    .event-card {
+        @apply block rounded px-2 py-1 text-xs mb-1 shadow-sm border border-l-4 cursor-pointer hover:opacity-80 transition-opacity;
+    }
+
+    /* Temas */
+    .theme-blue {
+        @apply bg-blue-50 border-blue-200 border-l-blue-500 text-blue-700;
+    }
+
+    .theme-pink {
+        @apply bg-pink-50 border-pink-200 border-l-pink-500 text-pink-700;
+    }
+
+    .theme-gray {
+        @apply bg-gray-50 border-gray-200 border-l-gray-500 text-gray-700;
+    }
+}
