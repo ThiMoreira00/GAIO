@@ -1,6 +1,6 @@
 {
-    "name": "thimoreira00/projeto-gaio",
-    "description": "O Sistema GAIO, acrônimo de Gerenciador Acadêmico Institucional Online, é um sistema web acadêmico para instituições públicas de ensino superior, desenvolvido como Trabalho de Conclusão de Curso em Análise e Desenvolvimento de Sistemas na FAETERJ Rio de Janeiro.",
+    "name": "thimoreira00/gaio-ads",
+    "description": "O Sistema GAIO, acrônimo de Gerenciador Acadêmico Institucional Online, é um sistema acadêmico para instituições públicas de ensino superior, desenvolvido como Trabalho de Conclusão de Curso em Análise e Desenvolvimento de Sistemas na FAETERJ Rio de Janeiro.",
     "type": "project",
     "autoload": {
         "psr-4": {
@@ -16,14 +16,31 @@
     "require": {
         "phpmailer/phpmailer": "^6.10",
         "vlucas/phpdotenv": "^5.6",
-        "illuminate/database": "^12.21"
+        "illuminate/database": "^12.21",
+        "illuminate/pagination": "^12.24",
+        "illuminate/validation": "^12.36",
+        "illuminate/cache": "^12.38",
+        "michelf/php-markdown": "^2.0",
+        "ext-intl": "*",
+        "guzzlehttp/guzzle": "^7.10",
+        "phpoffice/phpspreadsheet": "^5.2",
+        "tecnickcom/tcpdf": "^6.10",
+        "phpoffice/phpword": "^1.4"
     },
     "require-dev": {
-        "nunomaduro/phpinsights": "^2.13"
+        "nunomaduro/phpinsights": "^2.13",
+        "phpdocumentor/shim": "^3.8"
     },
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
-        }
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpdocumentor/shim": true
+        },
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php -r \"echo 'Autoloader atualizado com sucesso!\\n';\""
+        ]
     }
 }
