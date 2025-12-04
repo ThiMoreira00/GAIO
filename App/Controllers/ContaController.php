@@ -333,8 +333,20 @@ class ContaController extends Controller
             $telefone_celular = preg_replace('/[^0-9]/', '', $telefone_celular);
 
             // Verifica se os dados coincidem
-            if ($dadosEndereco["logradouro"] != $endereco || $dadosEndereco["bairro"] != $bairro || $dadosEndereco["cidade"] != $cidade || $dadosEndereco["uf"] != $uf) {
-                throw new Exception('Os dados informados não coincidem com o CEP registrado. Verifique-os e tente novamente.');
+            if (strtolower($dadosEndereco["logradouro"]) != strtolower($endereco)) {
+                throw new Exception('O endereço informado não coincide com o CEP registrado. Você quis dizer: "' . $dadosEndereco["logradouro"] . '"? Verifique-o e tente novamente.');
+            }
+
+            if (strtolower($dadosEndereco["bairro"]) != strtolower($bairro)) {
+                throw new Exception('O bairro informado não coincide com o CEP registrado. Você quis dizer: "' . $dadosEndereco["bairro"] . '"? Verifique-o e tente novamente.');
+            }
+
+            if (strtolower($dadosEndereco["cidade"]) != strtolower($cidade)) {
+                throw new Exception('A cidade informada não coincide com o CEP registrado. Você quis dizer: "' . $dadosEndereco["cidade"] . '"? Verifique-a e tente novamente.');
+            }
+
+            if (strtolower($dadosEndereco["uf"]) != strtolower($uf)) {
+                throw new Exception('A UF informada não coincide com o CEP registrado. Você quis dizer: "' . $dadosEndereco["uf"] . '"? Verifique-a e tente novamente.');
             }
 
             // Verifica se o telefone celular é válido (formato: (99) 99999-9999 ou variações)

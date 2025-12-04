@@ -103,7 +103,7 @@ class PainelController extends Controller
                 $turmas = Cache::remember($cacheKey, 300, function() use ($matricula) {
                     $inscricoes = Inscricao::with([
                         'turma.disciplina.componenteCurricular:id,nome',
-                        'turma.disciplina:id,sigla,componente_curricular_id',
+                        'turma.disciplina:id,componente_curricular_id',
                         'turma.professor:id,usuario_id',
                         'turma.professor.usuario:id,nome_civil,nome_social'
                     ])
@@ -175,8 +175,8 @@ class PainelController extends Controller
         // Cache das turmas ativas do painel do administrador por 5 minutos
         $turmas = Cache::remember('painel.admin.turmas', 300, function() {
             return Turma::with([
-                'disciplina.componenteCurricular:id,nome',
-                'disciplina:id,sigla,componente_curricular_id',
+                'disciplina.componenteCurricular:id,sigla,nome',
+                'disciplina:id,componente_curricular_id',
                 'professor:id,usuario_id',
                 'professor.usuario:id,nome_civil,nome_social'
             ])
@@ -192,5 +192,13 @@ class PainelController extends Controller
             'turmas' => $turmas
         ]);
 
+    }
+
+
+    public function exibirWIP(): void
+    {
+        $this->renderizar('erros/erro-wip', [
+            'titulo' => 'Em construção'
+        ]);
     }
 }
