@@ -68,29 +68,6 @@
                     Entrar
                 </button>
             </form>
-
-            <div class="mt-10">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-200"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm font-medium">
-                        <span class="bg-white px-6 text-gray-500">Ou continue com</span>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex gap-4">
-                    <a href="#" class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-100">
-                        <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
-                            <path fill="#EA4335" d="M12.0003 4.75C13.7703 4.75 15.3553 5.36 16.6053 6.55L20.0303 3.125C17.9503 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.61L5.27028 9.705C6.21525 6.86 8.87028 4.75 12.0003 4.75Z" />
-                            <path fill="#4285F4" d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" />
-                            <path fill="#FBBC05" d="M5.265 14.295C5.025 13.57 4.885 12.8 4.885 12C4.885 11.2 5.02 10.43 5.265 9.705L1.275 6.61C0.46 8.23 0 10.06 0 12C0 13.94 0.46 15.77 1.28 17.39L5.265 14.295Z" />
-                            <path fill="#34A853" d="M12.0004 24C15.2404 24 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24 12.0004 24Z" />
-                        </svg>
-                        <span class="text-sm font-semibold">Google</span>
-                    </a>
-                </div>
-            </div>
         </div>
     </section>
 </main>
