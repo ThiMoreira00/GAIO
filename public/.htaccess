@@ -1,48 +1,24 @@
-# Ativar o modo de reescrita
-RewriteEngine On
-
 <IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
     RewriteEngine On
-    RewriteBase /
-    RewriteCond %{REQUEST_URI} !^/resources/views/erros/
-    RewriteCond %{REQUEST_FILENAME} !-f
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^.*$ index.php [L,QSA]
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>
-
-# Redirecionamento de erros personalizados
-RewriteCond %{REQUEST_URI} ^/400$
-RewriteRule ^ /resources/views/erros/erro-400.php [L]
-
-RewriteCond %{REQUEST_URI} ^/401$
-RewriteRule ^ /resources/views/erros/erro-401.php [L]
-
-RewriteCond %{REQUEST_URI} ^/403$
-RewriteRule ^ /resources/views/erros/erro-403.php [L]
-
-RewriteCond %{REQUEST_URI} ^/404$
-RewriteRule ^ /resources/views/erros/erro-404.php [L]
-
-RewriteCond %{REQUEST_URI} ^/405$
-RewriteRule ^ /resources/views/erros/erro-405.php [L]
-
-RewriteCond %{REQUEST_URI} ^/408$
-RewriteRule ^ /resources/views/erros/erro-408.php [L]
-
-RewriteCond %{REQUEST_URI} ^/500$
-RewriteRule ^ /resources/views/erros/erro-500.php [L]
-
-RewriteCond %{REQUEST_URI} ^/503$
-RewriteRule ^ /resources/views/erros/erro-503.php [L]
-
-ErrorDocument 400 /resources/views/erros/erro-400.php
-ErrorDocument 401 /resources/views/erros/erro-401.php
-ErrorDocument 403 /resources/views/erros/erro-403.php
-ErrorDocument 404 /resources/views/erros/erro-404.php
-ErrorDocument 405 /resources/views/erros/erro-405.php
-ErrorDocument 408 /resources/views/erros/erro-408.php
-ErrorDocument 500 /resources/views/erros/erro-500.php
-ErrorDocument 503 /resources/views/erros/erro-503.php
 
 # Segurança contra XSS (Cross-site Scripting)
 <IfModule mod_headers.c>
@@ -51,18 +27,11 @@ ErrorDocument 503 /resources/views/erros/erro-503.php
     Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# Proteção contra listagem de diretórios
-Options -Indexes
-
 # Proteção contra acesso a arquivos sensíveis
 <FilesMatch "\.(htaccess|htpasswd|ini|env|log|sh|bak|sql)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
-
-# Forçar uso de HTTPS
-# RewriteCond %{HTTPS} off
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Evitar cache para arquivos PHP
 <FilesMatch "\.php$">
