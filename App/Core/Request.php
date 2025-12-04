@@ -112,10 +112,10 @@ class Request
      * Obtém um parâmetro da requisição POST
      *
      * @param string $chave
-     * @param string|int|null $default
-     * @return string|int|null
+     * @param string|int|array|null $default
+     * @return string|int|array|null
      */
-    public function post(string $chave, string|int|null $default = null): string|int|null
+    public function post(string $chave, string|int|array|null $default = null): string|int|array|null
     {
         return $this->parametrosPOST[$chave] ?? $default;
     }

@@ -17,6 +17,7 @@ use Closure;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
+use App\Core\Response;
 
 /**
  * Classe Router
@@ -203,11 +204,10 @@ abstract class Router
         $metodoRequisicao = strtoupper($_SERVER['REQUEST_METHOD']);
 
         // Inicializa variáveis de controle
-        $rotaEncontrada = null;
-        $parametros = [];
+        $rotasEncontradas = [];
         $metodoPermitidoParaUri = false;
 
-        // Percorre todas as rotas registradas
+        // Percorre todas as rotas registradas e coleta todas as correspondências
         foreach (self::$rotas as $rota) {
             // Converte parâmetros da rota em expressão regular considerando as restrições
             $padraoRegex = $rota['uri'];
@@ -227,19 +227,24 @@ abstract class Router
             if (preg_match($padraoRegex, $uriRequisicao, $matches)) {
                 // Verifica se o método HTTP corresponde
                 if ($metodoRequisicao === $rota['metodo']) {
-                    $rotaEncontrada = $rota;
                     // Extrai os parâmetros nomeados da URI
                     $parametros = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                    break;
+                    $rotasEncontradas[] = ['rota' => $rota, 'parametros' => $parametros];
                 }
                 // Marca que a URI existe mas com método diferente
                 $metodoPermitidoParaUri = true;
             }
         }
 
-        // Processa o resultado da busca
-        if ($rotaEncontrada) {
-            self::executarAcao($rotaEncontrada, $parametros);
+        // Tenta executar cada rota encontrada até uma ter sucesso nos middlewares
+        if (!empty($rotasEncontradas)) {
+            foreach ($rotasEncontradas as $rotaData) {
+                if (self::executarAcao($rotaData['rota'], $rotaData['parametros'])) {
+                    return; // Rota executada com sucesso
+                }
+            }
+            // Se chegou aqui, nenhuma rota passou nos middlewares
+            Response::redirecionar('/403');
         } elseif ($metodoPermitidoParaUri) {
             // Retorna erro 405 quando o método não é permitido
             self::enviarErro(405, 'Método não permitido.');
@@ -254,9 +259,10 @@ abstract class Router
      *
      * @param array<string> $rota A rota encontrada.
      * @param array<string> $parametros Os parâmetros extraídos da URI.
+     * @return bool Retorna true se a execução foi bem-sucedida, false se algum middleware falhou
      * @throws ReflectionException
      */
-    private static function executarAcao(array $rota, array $parametros): void
+    private static function executarAcao(array $rota, array $parametros): bool
     {
 
         // Executa os middlewares associados à rota
@@ -266,13 +272,20 @@ abstract class Router
         }
         
         foreach ($middlewares as $middleware) {
+            $resultado = null;
+            
             // Verifica se o middleware é uma string e executa
             if (is_string($middleware)) {
-                (new $middleware())->executar();
+                $resultado = (new $middleware())->executar();
             }
             // Verifica se é um objeto com método executar e o invoca
             elseif (is_object($middleware) && method_exists($middleware, 'executar')) {
-                $middleware->executar();
+                $resultado = $middleware->executar();
+            }
+            
+            // Se o middleware retornou false, aborta e tenta próxima rota
+            if ($resultado === false) {
+                return false;
             }
         }
 
@@ -281,7 +294,7 @@ abstract class Router
         // Executa a ação se for uma Closure
         if ($acao instanceof Closure) {
             call_user_func_array($acao, $parametros);
-            return;
+            return true;
         }
 
         // Processa a ação se for uma string no formato 'Controller@metodo'
@@ -293,7 +306,7 @@ abstract class Router
             // Verifica se o controller existe
             if (!class_exists($nomeClasseController)) {
                 self::enviarErro(500, "Controller '{$nomeClasseController}' não encontrado.");
-                return;
+                return true;
             }
 
             // Instancia o controller
@@ -302,7 +315,7 @@ abstract class Router
             // Verifica se o método existe no controller
             if (!method_exists($controller, $nomeMetodo)) {
                 self::enviarErro(500, "Método '{$nomeMetodo}' não encontrado no controller '{$nomeClasseController}'.");
-                return;
+                return true;
             }
 
             // Obtém informações do método via reflexão
@@ -327,7 +340,10 @@ abstract class Router
 
             // Executa o método do controller com os argumentos resolvidos
             $reflexaoMetodo->invokeArgs($controller, $args);
+            return true;
         }
+        
+        return true;
     }
 
     /**
