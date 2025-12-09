@@ -37,5 +37,4 @@ composer install
 - [@ThiMoreira00](https://www.github.com/ThiMoreira00) - Desenvolvedor
 
 ## 📄 Licença
-Este software é proprietário e de uso restrito. Todos os direitos são reservados ao desenvolvedor do projeto - Thiago Moreira.
-Não é permitida a reprodução, distribuição ou modificação deste sistema sem autorização prévia e expressa do responsável legal.
+Este projeto está licenciado sob a Licença MIT. É concedida permissão, gratuitamente, a qualquer pessoa que obtenha uma cópia deste software e dos arquivos de documentação associados, para lidar no Software sem restrições, incluindo, sem limitação, os direitos de usar, copiar, modificar, fundir, publicar, distribuir, sublicenciar e/ou vender cópias do Software.
