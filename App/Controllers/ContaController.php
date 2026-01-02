@@ -304,7 +304,7 @@ class ContaController extends Controller
             }
 
             // Obtenção dos dados do formulário
-            $cep = $request->post('cep');
+            $cep = str_replace(['.', '-'], '', $request->post('cep'));
             $endereco = $request->post('endereco');
             $numero = $request->post('numero');
             $complemento = $request->post('complemento');
@@ -366,6 +366,13 @@ class ContaController extends Controller
 
             // Atualiza os dados do usuário
             $usuarioDadosContatos = $usuarioAutenticado->contato()->first();
+
+            // Se não tiver, cria
+            if (!$usuarioDadosContatos) {
+                $usuarioDadosContatos = new UsuarioContato();
+                $usuarioDadosContatos->atribuirUsuarioId($usuarioAutenticado->obterId());
+            }
+            $usuarioDadosContatos->atribuirCEP($cep);
             $usuarioDadosContatos->atribuirEndereco($endereco);
             $usuarioDadosContatos->atribuirNumero($numero);
             $usuarioDadosContatos->atribuirComplemento($complemento);
