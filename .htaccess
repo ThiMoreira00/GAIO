@@ -1,0 +1,37 @@
+# Desativa a listagem de arquivos e pastas no navegador
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Se for um arquivo físico que está na RAIZ (ex: um robots.txt), serve ele
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # 2. Se for um arquivo físico que está DENTRO da pasta public/ (ex: css, js, imagens),
+    # serve ele silenciosamente puxando de lá
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # 3. Envia todo o resto (incluindo a raiz "/", diretórios e rotas inventadas) para o index.php
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
+
+# Segurança contra XSS (Cross-site Scripting)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Proteção contra acesso a arquivos sensíveis
+<FilesMatch "\.(htaccess|htpasswd|ini|env|log|sh|bak|sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Evitar cache para arquivos PHP
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+</FilesMatch>

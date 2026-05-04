@@ -25,6 +25,7 @@
         "illuminate/filesystem": "^13.7",
         "illuminate/translation": "^13.7",
         "illuminate/validation": "^13.7",
-        "illuminate/cache": "^13.7"
+        "illuminate/cache": "^13.7",
+        "michelf/php-markdown": "^2.0"
     }
 }
