@@ -73,6 +73,11 @@ class UsuarioLogin extends Model
         return $query->where('nome_acesso', $nomeAcesso);
     }
 
+    public function scopeUsuarioId($query, int $usuarioId): Builder
+    {
+        return $query->where('usuario_id', $usuarioId);
+    }
+
 
     // --- RELACIONAMENTOS ---
 

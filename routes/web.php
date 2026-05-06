@@ -58,7 +58,7 @@ $router->post('/esqueci-senha', [AuthController::class, 'enviarLinkRedefinicao']
 // Redefinição de senha
 // ------------------------------
 $router->get('/redefinir-senha/{token}', [AuthController::class, 'exibirRedefinicaoSenha'])
-    ->where('token', '[a-zA-Z0-9]+');
+    ->where('token', '[A-Za-z0-9\-\_]+');
 
 $router->post('/redefinir-senha', [AuthController::class, 'salvarNovaSenha']);
 
@@ -66,7 +66,7 @@ $router->post('/redefinir-senha', [AuthController::class, 'salvarNovaSenha']);
 // Alteração obrigatória de senha
 // ------------------------------
 $router->get('/alterar-senha/{token}', [AuthController::class, 'exibirAlterarSenha'])
-    ->where('token', '[a-zA-Z0-9]+');
+    ->where('token', '[A-Za-z0-9\-\_]+');
 
 $router->post('/alterar-senha', [AuthController::class, 'salvarSenhaAlterada']);
 

@@ -92,7 +92,7 @@ class AuthController extends Controller
         // Renderiza a página de "Esqueci minha senha"
         $this->renderizar('auth/esqueci-senha', [
             'token_csrf' => $this->gerarTokenCSRF()
-        ]);
+        ], null);
     }
 
     /**
@@ -124,11 +124,11 @@ class AuthController extends Controller
             $this->renderizar('auth/redefinir-senha', [
                 'token_csrf' => $this->gerarTokenCSRF(),
                 'token_redefinicao' => $token_redefinicao
-            ]);
+            ], null);
 
         } catch (Exception $exception) {
             http_response_code(400);
-            $this->renderizar('erros/erro-400', ['mensagem' => $exception->getMessage() ?? 'Erro ao tentar redefinir sua senha. Tente novamente mais tarde.']);;
+            $this->renderizar('erros/erro-400', ['mensagem' => $exception->getMessage() ?? 'Erro ao tentar redefinir sua senha. Tente novamente mais tarde.'], null);
         }
 
     }
@@ -246,7 +246,7 @@ class AuthController extends Controller
             $usuario = Usuario::email($email)->first();
 
             // Verificação se o usuário existe
-            if ($usuario) {
+            if (!empty($usuario)) {
 
                 // Gera um token de redefinição de senha
                 $token = UsuarioToken::gerarToken();
@@ -271,7 +271,7 @@ class AuthController extends Controller
 
                 // Envia o link de redefinição de senha para o usuário
                 $emailService = new EmailService();
-                $emailService->enviarEmailRedefinicaoSenha(
+                $enviado = $emailService->enviarEmailRedefinicaoSenha(
                     $email,
                     [
                         'link_redefinicao' => $link_redefinicao,
@@ -334,7 +334,7 @@ class AuthController extends Controller
             }
 
             // 2. A senha deve possuir uma letra minúscula e uma letra maiúscula
-            if (preg_match('/^(?=.*[a-z])(?=.*[A-Z]).+$/', $senhaNova)) {
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z]).+$/', $senhaNova)) {
                 throw new Exception('A senha nova deve possuir uma letra minúscula e uma letra maiúscula. Altere-a e tente novamente.');
             }
 
