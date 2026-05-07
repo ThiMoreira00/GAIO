@@ -104,6 +104,14 @@ $router->group(['middleware' => [AuthMiddleware::class]], function (Router $rout
     // Configurações e notificações
     // ------------------------------
     $router->get('/configuracoes', [ContaController::class, 'exibirConfiguracoes']);
+
+    $router->post('/configuracoes/informacoes-pessoais', [ContaController::class, 'salvarInformacoesPessoais']);
+    $router->post('/configuracoes/senha', [ContaController::class, 'salvarSenha']);
+    $router->post('/configuracoes/contato', [ContaController::class, 'salvarInformacoesContato']);
+
+
+
+
     $router->get('/notificacoes', [NotificacaoController::class, 'exibirIndex']);
 
     $router->get('/carteirinha', [ContaController::class, 'exibirCarteirinha'])
