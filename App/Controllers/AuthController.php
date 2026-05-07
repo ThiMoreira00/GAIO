@@ -185,18 +185,18 @@ class AuthController extends Controller
 
                 // Armazena no token de usuário para validação
                 UsuarioToken::where('usuario_id', $usuario->obterId())
-                    ->where('tipo', 'alteracao_senha_obrigatoria')
+                    ->where('tipo', 'ALTERACAO_SENHA_OBRIGATORIA')
                     ->where('status', true)
                     ->update(['status' => false]);
 
-                $usuario->tokens()->create([
-                    'tipo' => 'alteracao_senha_obrigatoria',
+                    $usuario->tokens()->create([
+                        'tipo' => 'ALTERACAO_SENHA_OBRIGATORIA',
                     'token_hash' => $tokenAlteracao,
                     'data_expiracao' => date('Y-m-d H:i:s', strtotime('+30 minutes'))
-                    ]);
+                ]);
                     
-                    // Remove token CSRF
-                    $this->removerTokenCSRF();
+                // Remove token CSRF
+                $this->removerTokenCSRF();
                     
                     // Redireciona para a página de alteração obrigatória de senha
                 flash()->aviso('Você está usando a senha padrão. Por segurança, altere-a para continuar.');
@@ -256,12 +256,12 @@ class AuthController extends Controller
 
                 // Resetar tokens de redefinição de senha anteriores
                 UsuarioToken::where('usuario_id', $usuario->obterId())
-                    ->where('tipo', 'redefinicao_senha')
+                    ->where('tipo', 'REDEFINICAO_SENHA')
                     ->where('status', true)
                     ->update(['status' => false]);
 
                 $usuarioTokens->create([
-                    'tipo' => 'redefinicao_senha',
+                    'tipo' => 'REDEFINICAO_SENHA',
                     'token_hash' => $token,
                     'data_expiracao' => date('Y-m-d H:i:s', strtotime('+1 hour'))
                 ]);
@@ -408,7 +408,7 @@ class AuthController extends Controller
      * @param string $token
      * @return void
      */
-    public function exibirAlterarSenhaObrigatoria(string $token): void
+    public function exibirAlterarSenha(string $token): void
     {
         try {
             if (empty($token)) {
@@ -417,7 +417,7 @@ class AuthController extends Controller
 
             // Verifica se o token é válido
             $usuarioToken = UsuarioToken::where('token_hash', $token)
-                ->where('tipo', 'alteracao_senha_obrigatoria')
+                 ->where('tipo', 'ALTERACAO_SENHA_OBRIGATORIA')
                 ->where('status', true)
                 ->first();
 
@@ -434,17 +434,6 @@ class AuthController extends Controller
             flash()->erro($exception->getMessage());
             $this->redirecionar('/login');
         }
-    }
-
-    /**
-     * Alias de compatibilidade para rota legada.
-     *
-     * @param string $token
-     * @return void
-     */
-    public function exibirAlterarSenha(string $token): void
-    {
-        $this->exibirAlterarSenhaObrigatoria($token);
     }
 
     /**
@@ -487,7 +476,7 @@ class AuthController extends Controller
 
             // Verificar token
             $usuarioToken = UsuarioToken::where('token_hash', $tokenAlteracao)
-                ->where('tipo', 'alteracao_senha_obrigatoria')
+                 ->where('tipo', 'ALTERACAO_SENHA_OBRIGATORIA')
                 ->where('status', true)
                 ->first();
 
