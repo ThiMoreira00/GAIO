@@ -4,3 +4,4 @@ storage/*
 node_modules/*
 vendor/*
 *.log
+public/uploads/perfis/*
