@@ -5,3 +5,4 @@ node_modules/*
 vendor/*
 *.log
 public/uploads/perfis/*
+public/assets/css/tailwindcss-output.css
