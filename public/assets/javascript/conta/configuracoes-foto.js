@@ -2,6 +2,7 @@ const fotoPerfilInput = document.getElementById('fotoPerfilInput');
 const imagePreview = document.getElementById('fotoPerfilImagem');
 const removerFotoButton = document.getElementById('removerFotoButton');
 const alterarFotoButton = document.getElementById('alterarFotoButton');
+const removerFotoInput = document.getElementById('remover-foto');
 
 if (!fotoPerfilInput || !imagePreview || !removerFotoButton || !alterarFotoButton) {
     console.warn('[configuracoes-foto] Elementos de foto de perfil não encontrados.');
@@ -9,6 +10,11 @@ if (!fotoPerfilInput || !imagePreview || !removerFotoButton || !alterarFotoButto
 
 // Placeholder para a imagem padrão (círculo preto)
     const imagemPadrao = '/assets/img/usuario-padrao.png';
+
+    // Inicializar a exibição do botão "Remover" com base na imagem atual
+    if (!imagePreview.src.includes(imagemPadrao)) {
+        removerFotoButton.classList.remove('hidden');
+    }
 
     // Adicionar um evento de, quando clicar no botão de 'Alterar', clique no input de arquivo
     alterarFotoButton.addEventListener('click', function() {
@@ -22,6 +28,8 @@ if (!fotoPerfilInput || !imagePreview || !removerFotoButton || !alterarFotoButto
             const reader = new FileReader();
             reader.onload = function(e) {
                 imagePreview.src = e.target.result;
+                removerFotoButton.classList.remove('hidden');
+                if (removerFotoInput) removerFotoInput.value = 'false';
             };
             reader.readAsDataURL(file);
         }
@@ -31,5 +39,7 @@ if (!fotoPerfilInput || !imagePreview || !removerFotoButton || !alterarFotoButto
     removerFotoButton.addEventListener('click', function() {
         imagePreview.src = imagemPadrao;
         fotoPerfilInput.value = '';
+        removerFotoButton.classList.add('hidden');
+        if (removerFotoInput) removerFotoInput.value = 'true';
     });
 }

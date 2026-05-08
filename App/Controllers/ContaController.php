@@ -169,7 +169,9 @@ class ContaController extends Controller
             }
 
             // Verifica se o usuário removeu a imagem de perfil
-            if (($usuarioAutenticado->obterCaminhoFoto() != null) && $imagemPerfil && $imagemPerfil['error'] == UPLOAD_ERR_NO_FILE) {
+            $removerFoto = $request->post('remover-foto') === 'true';
+
+            if (($usuarioAutenticado->obterCaminhoFoto() != null) && $removerFoto) {
 
                 $diretorioImagensPerfil = rtrim(
                     dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . trim($_ENV['SISTEMA_IMAGENS_PERFIL'] ?? 'uploads/perfis/', '/\\'),

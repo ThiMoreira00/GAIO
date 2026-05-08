@@ -51,6 +51,7 @@ use App\Models\Enumerations\UsuarioSexo;
                 </div>
 
                 <form id="formulario-informacoes-conta" action="/configuracoes/informacoes-pessoais" method="POST" enctype="multipart/form-data" novalidate>
+                    <input type="hidden" id="remover-foto" name="remover-foto" value="false">
                     <label for="imagem-perfil" class="form-label mb-3">
                         Foto de perfil
                     </label>
@@ -229,7 +230,7 @@ use App\Models\Enumerations\UsuarioSexo;
                                 </li>
                                 <li id="req-special" class="flex items-center text-sm text-gray-500">
                                     <span class="material-icons-sharp mr-2 flex-shrink-0 transition-colors duration-300">check_circle</span>
-                                    <span class="transition-colors duration-300">Inclusão de pelo menos um caractere especial (!@#?)</span>
+                                    <span class="transition-colors duration-300">Inclusão de pelo menos um caractere especial (!@#?.)</span>
                                 </li>
                             </ul>
                         </div>
