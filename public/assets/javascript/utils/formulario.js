@@ -110,11 +110,16 @@ class Formulario {
                 return; // Impedir envio se validação falhar
             }
 
+            const usarFormData = (this.form.enctype || '').toLowerCase() === 'multipart/form-data';
+            const dadosFormulario = usarFormData ? new FormData(this.form) : $(this.form).serialize();
+
             // Requisição pelo jQuery
             $.ajax({
                 url: this.form.action,
                 type: this.form.method,
-                data: $(this.form).serialize(),
+                data: dadosFormulario,
+                processData: !usarFormData,
+                contentType: usarFormData ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'json',
                 beforeSend: () => {
                     if (this.onBeforeSubmit) this.onBeforeSubmit();
