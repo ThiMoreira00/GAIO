@@ -155,7 +155,7 @@ abstract class Response
         require $caminhoCompleto;
         $conteudo = ob_get_clean();
 
-        if (!$layout) {
+        if (!$layout || empty($layout)) {
             return $conteudo;
         }
 
