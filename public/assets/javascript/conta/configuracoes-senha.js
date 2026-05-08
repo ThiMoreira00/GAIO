@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateRequirementUI(requirements.case, validationState.case);
 
         // 3. Validação de Caractere Especial
-        validationState.special = /[!@#?]/.test(pass);
+        validationState.special = /[!@#?.]/.test(pass);
         updateRequirementUI(requirements.special, validationState.special);
 
         // Checa a confirmação de senha toda vez que a senha principal muda
