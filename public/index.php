@@ -81,7 +81,7 @@ try {
 
     echo Response::renderizar('erros/erro-500', [
         'mensagem' => $e->getMessage()
-    ]);
+    ], null);
 }
 
 
