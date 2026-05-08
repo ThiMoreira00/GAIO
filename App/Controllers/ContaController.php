@@ -15,6 +15,7 @@ use App\Core\Controller;
 use App\Core\Request;
 use App\Models\Enumerations\UF;
 use App\Models\Usuario;
+use App\Models\UsuarioLogin;
 use App\Models\UsuarioContato;
 use App\Services\AuthService;
 use App\Services\ViaCepService;
@@ -245,6 +246,9 @@ class ContaController extends Controller
                 throw new Exception('As senhas não coincidem. Verifique-as e tente novamente.');
             }
 
+            /**
+             * @var UsuarioLogin $loginUsuarioAutenticado
+             */
             $loginUsuarioAutenticado = $usuarioAutenticado->login()->first();
 
             // Verifica se a senha atual é a que está registrada
