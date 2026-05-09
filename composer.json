@@ -26,6 +26,8 @@
         "illuminate/translation": "^13.7",
         "illuminate/validation": "^13.7",
         "illuminate/cache": "^13.7",
-        "michelf/php-markdown": "^2.0"
+        "michelf/php-markdown": "^2.0",
+        "phpoffice/phpspreadsheet": "^5.7",
+        "symfony/expression-language": "^7.4"
     }
 }
