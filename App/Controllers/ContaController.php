@@ -381,7 +381,7 @@ class ContaController extends Controller
             }
 
             // Verifica se a UF informada é válida
-            if (!in_array($uf, array_map(fn($case) => $case->value, UF::cases()))) {
+            if (!UF::fromName($uf)) {
                 throw new Exception('A UF informada não é válida.');
             }
 
@@ -399,7 +399,7 @@ class ContaController extends Controller
             $usuarioDadosContatos->atribuirComplemento($complemento);
             $usuarioDadosContatos->atribuirBairro($bairro);
             $usuarioDadosContatos->atribuirCidade($cidade);
-            $usuarioDadosContatos->atribuirUF(UF::from($uf));
+            $usuarioDadosContatos->atribuirUF(UF::fromName($uf));
             $usuarioDadosContatos->atribuirTelefoneFixo($telefone_fixo);
             $usuarioDadosContatos->atribuirTelefoneCelular($telefone_celular);
             $usuarioDadosContatos->salvar();
