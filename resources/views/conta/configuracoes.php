@@ -426,7 +426,7 @@ use App\Models\Enumerations\UsuarioSexo;
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <span class="material-icons-sharp text-gray-400 w-24">place</span>
                                 </div>
-                                <input type="text" name="cep" id="cep" required class="form-input pl-10 w-full" value="<?= $configuracoes['contato']?->obterCEPFormatado() ?? '' ?>">
+                                <input type="text" name="cep" id="cep" required class="form-input pl-10 w-full" value="<?= $configuracoes['contato']?->obterCEPFormatado() ?? '' ?>" maxlength="8">
                                 <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2" id="pesquisar-cep">
                                     <span class="material-icons-sharp text-gray-500">search</span>
                                 </button>

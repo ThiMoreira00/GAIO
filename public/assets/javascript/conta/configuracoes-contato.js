@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', function () {
             formularioInformacoesContato.querySelector('#bairro').value = data.bairro || '';
             formularioInformacoesContato.querySelector('#cidade').value = data.localidade || '';
             formularioInformacoesContato.querySelector('#uf').value = data.uf || '';
+            formularioInformacoesContato.querySelector('#numero').value = "";
+            formularioInformacoesContato.querySelector('#numero').focus();
 
             verificarAlteracoes();
 
