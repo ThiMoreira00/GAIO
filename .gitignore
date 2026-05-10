@@ -1,8 +1,9 @@
 .env
-.vscode/*
-storage/*
-node_modules/*
-vendor/*
 *.log
+.vscode/*
+config/unidade.json
+node_modules/*
 public/uploads/perfis/*
 public/assets/css/tailwindcss-output.css
+storage/*
+vendor/*
