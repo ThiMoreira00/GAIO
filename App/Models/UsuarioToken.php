@@ -130,13 +130,13 @@ class UsuarioToken extends Model
      * Filtro de token com base no tipo de token hash (redefinição) + status
      *
      * @param $query
-     * @param string $tipo
+     * @param string $tokenHash
      * @param bool $status
      * @return Builder
      */
     public function scopeTokenRedefinicao($query, string $tokenHash, bool $status): Builder
     {
-        return $query->where('tipo', 'redefinicao_senha')
+        return $query->where('tipo', 'REDEFINICAO_SENHA')
             ->where('status', $status)
             ->where('token_hash', $tokenHash);
     }

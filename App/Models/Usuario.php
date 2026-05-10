@@ -403,7 +403,16 @@ class Usuario extends Model
      * @return string
      */
     public function obterRGFormatado(): string {
-        return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{1})/', '$1.$2.$3-$4', $this->rg);
+
+        if (strlen($this->rg) == 9) {
+            return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{1})/', '$1.$2.$3-$4', $this->rg);
+
+        } elseif (strlen($this->rg) == 11) {
+            return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{3})/', '$1.$2.$3.$4', $this->rg);
+
+        } else {
+            return $this->rg; // Retorna sem formatação se o formato for desconhecido
+        }
     }
 
     /**
@@ -673,7 +682,9 @@ class Usuario extends Model
      * @return string
      */
     public function obterFotoPerfil(): string {
-        return empty($this->obterCaminhoFoto()) ? sprintf('https://ui-avatars.com/api/?name=%s&color=7F9CF5&background=EBF4FF', urlencode(str_replace(' ', '+', $this->obterNomeReduzido()))) : sprintf(obterURL('/' . $_ENV['SISTEMA_IMAGENS_PERFIL'] . $this->obterCaminhoFoto()), $this->obterCaminhoFoto());
+        return empty($this->obterCaminhoFoto())
+            ? sprintf('https://ui-avatars.com/api/?name=%s&color=7F9CF5&background=EBF4FF', urlencode(str_replace(' ', '+', $this->obterNomeReduzido())))
+            : obterURL('/' . $_ENV['SISTEMA_IMAGENS_PERFIL'] . $this->obterCaminhoFoto());
     }
 
     /**
