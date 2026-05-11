@@ -28,6 +28,7 @@
         "illuminate/cache": "^13.7",
         "michelf/php-markdown": "^2.0",
         "phpoffice/phpspreadsheet": "^5.7",
-        "symfony/expression-language": "^7.4"
+        "symfony/expression-language": "^7.4",
+        "illuminate/pagination": "^13.8"
     }
 }
