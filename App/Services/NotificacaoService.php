@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Helper\DataFormatador;
 use App\Models\Usuario;
 use App\Models\Notificacao;
 use App\Models\NotificacaoModelo;
 use App\Models\NotificacaoLeitura;
+use App\Models\Log;
+use Carbon\Carbon;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -21,6 +22,34 @@ use Exception;
 
 class NotificacaoService
 {
+
+    private static function normalizarTipoDestinatario(?string $tipo): string
+    {
+        $tipo = trim((string) $tipo);
+        $tipo = trim($tipo, " \t\n\r\0\x0B'\"");
+        $tipo = str_replace('/', '\\', $tipo);
+        $tipo = preg_replace('/\\\\+/', '\\', $tipo) ?? $tipo;
+        return ltrim($tipo, '\\');
+    }
+
+    private static function aplicarFiltroDestinatario($query, Usuario $usuario): void
+    {
+        $usuarioId = $usuario->obterId();
+        $usuarioTipo = self::normalizarTipoDestinatario(get_class($usuario));
+
+        $query->where('destinatario_id', $usuarioId)
+            ->where(function ($q) use ($usuarioTipo): void {
+                // Match exato para dados já normalizados.
+                $q->where('destinatario_tipo', $usuarioTipo)
+                    // Compatibilidade: alguns registros podem ter barra inicial.
+                    ->orWhere('destinatario_tipo', '\\' . $usuarioTipo)
+                    // Compatibilidade: remove aspas e converte '/' para '\\'.
+                    ->orWhereRaw(
+                        "TRIM(LEADING '\\\\' FROM REPLACE(REPLACE(REPLACE(TRIM(destinatario_tipo), '\"', ''), '\'', ''), '/', '\\\\')) = ?",
+                        [$usuarioTipo]
+                    );
+            });
+    }
 
     public static function criar(string $codigoModelo, array $destinatarios, array $dados): Notificacao
     {
@@ -55,7 +84,7 @@ class NotificacaoService
                 }
                 $notificacao->destinos()->create([
                     'destinatario_id' => $destinatario->obterId(),
-                    'destinatario_tipo' => get_class($destinatario),
+                    'destinatario_tipo' => self::normalizarTipoDestinatario(get_class($destinatario)),
                 ]);
             }
 
@@ -81,61 +110,73 @@ class NotificacaoService
     public function listarPorUsuario(Usuario $usuario, array $opcoes = []): LengthAwarePaginator
     {
 
-        $status = $opcoes['status'] ?? 'todas';
-        $porPagina = $opcoes['porPagina'] ?? 15;
-        $pagina = $opcoes['pagina'] ?? 1;
-        $busca = $opcoes['busca'] ?? null;
+        try {
+        
+            $status = $opcoes['status'] ?? 'todas';
+            $porPagina = $opcoes['porPagina'] ?? 15;
+            $pagina = $opcoes['pagina'] ?? 1;
+            $busca = $opcoes['busca'] ?? null;
 
-        $query = Notificacao::query()
-            ->with('modelo')
-            ->whereHas('destinos', function ($q) use ($usuario): void {
-                $q->where('destinatario_id', $usuario->id)
-                    ->where('destinatario_tipo', get_class($usuario));
+            $usuarioId = $usuario->obterId();
+
+            $query = Notificacao::query()
+                ->with('modelo')
+                ->whereHas('destinos', function ($q) use ($usuario): void {
+                    self::aplicarFiltroDestinatario($q, $usuario);
+                });
+
+            // Aplica o filtro de status de leitura
+            switch ($status) {
+                case 'lidas':
+                    $query->whereHas('leituras', fn($q) => $q->where('usuario_id', $usuarioId));
+                    break;
+                case 'nao_lidas':
+                    $query->whereDoesntHave('leituras', fn($q) => $q->where('usuario_id', $usuarioId));
+                    break;
+            }
+
+            // Aplica o filtro de busca textual, se houver
+            if (!empty($busca)) {
+                $query->where(function ($q) use ($busca) {
+                    $q->where('mensagem', 'LIKE', '%' . $busca . '%')
+                        ->orWhere('titulo', 'LIKE', '%' . $busca . '%');
+                });
+            }
+
+            // Adiciona o status de leitura específico do usuário atual a cada notificação
+            $notificacoes = $query->with(['leituras' => fn($q) => $q->where('usuario_id', $usuario->id)])
+                ->latest('data_registro')
+                ->paginate($porPagina, ['*'], 'page', $pagina);
+
+            $notificacoes->getCollection()->transform(function ($notificacao) {
+                $notificacao->lida = $notificacao->leituras->isNotEmpty();
+                $notificacao->data_leitura = $notificacao->lida ? $notificacao->leituras->first()->data_leitura : null;
+                $notificacao->icone = $notificacao->modelo->icone ?? 'fas fa-bell';
+                $notificacao->cor = $notificacao->modelo->cor ?? 'gray';
+                $notificacao->mensagem_html = self::formatarMensagem($notificacao->mensagem);
+                $notificacao->autor = ($notificacao->autor_id) ? Usuario::buscarPorId($notificacao->autor_id) : null;
+
+                $dataRegistro = $notificacao->data_registro;
+                $dataCarbon = ($dataRegistro instanceof \DateTimeInterface)
+                    ? Carbon::instance($dataRegistro)
+                    : Carbon::parse((string) $dataRegistro);
+
+                $notificacao->hora_formatada = $dataCarbon->format('H:i');
+                $notificacao->data_formatada = $dataCarbon->locale('pt_BR')->translatedFormat('d M Y');
+
+                unset($notificacao->leituras);
+                unset($notificacao->modelo);
+                unset($notificacao->modelo_id);
+                unset($notificacao->autor_id);
+                unset($notificacao->autor);
+
+                return $notificacao;
             });
 
-        // Aplica o filtro de status de leitura
-        switch ($status) {
-            case 'lidas':
-                $query->whereHas('leituras', fn($q) => $q->where('usuario_id', $usuario->id));
-                break;
-            case 'nao_lidas':
-                $query->whereDoesntHave('leituras', fn($q) => $q->where('usuario_id', $usuario->id));
-                break;
+            return $notificacoes;
+        } catch (Exception $e) {
+            throw new Exception('Erro ao listar notificações: ' . $e->getMessage());
         }
-
-        // Aplica o filtro de busca textual, se houver
-        if (!empty($busca)) {
-            $query->where(function ($q) use ($busca) {
-                $q->where('mensagem', 'LIKE', '%' . $busca . '%');
-            });
-        }
-
-        // Adiciona o status de leitura específico do usuário atual a cada notificação
-        $notificacoes = $query->with(['leituras' => fn($q) => $q->where('usuario_id', $usuario->id)])
-            ->latest('data_registro')
-            ->paginate($porPagina, ['*'], 'page', $pagina);
-
-        $notificacoes->getCollection()->transform(function ($notificacao) {
-            $notificacao->lida = $notificacao->leituras->isNotEmpty();
-            $notificacao->data_leitura = $notificacao->lida ? $notificacao->leituras->first()->data_leitura : null;
-            $notificacao->icone = $notificacao->modelo->icone ?? 'fas fa-bell';
-            $notificacao->cor = $notificacao->modelo->cor ?? 'gray';
-            $notificacao->mensagem_html = self::formatarMensagem($notificacao->mensagem);
-            $notificacao->autor = ($notificacao->autor_id) ? Usuario::buscarPorId($notificacao->autor_id) : null;
-
-            $notificacao->hora_formatada = date('H:i', strtotime($notificacao->data_registro));
-            $notificacao->data_formatada = date('d M Y', strtotime($notificacao->data_registro));
-
-            unset($notificacao->leituras);
-            unset($notificacao->modelo);
-            unset($notificacao->modelo_id);
-            unset($notificacao->autor_id);
-            unset($notificacao->autor);
-
-            return $notificacao;
-        });
-
-        return $notificacoes;
     }
 
 
@@ -170,11 +211,12 @@ class NotificacaoService
      */
     public function marcarTodasComoLidas(Usuario $usuario): int
     {
+        $usuarioId = $usuario->obterId();
+
         // 1. Busca os IDs de todas as notificações não lidas do usuário
-        $idsNaoLidas = Notificacao::whereDoesntHave('leituras', fn($q) => $q->where('usuario_id', $usuario->id))
+        $idsNaoLidas = Notificacao::whereDoesntHave('leituras', fn($q) => $q->where('usuario_id', $usuarioId))
             ->whereHas('destinos', function ($q) use ($usuario): void {
-                $q->where('destinatario_id', $usuario->id)
-                    ->where('destinatario_tipo', get_class($usuario));
+                self::aplicarFiltroDestinatario($q, $usuario);
             })
             ->pluck('id');
 
@@ -186,7 +228,7 @@ class NotificacaoService
         $agora = date('Y-m-d H:i:s');
         $leiturasParaInserir = $idsNaoLidas->map(fn($id) => [
             'notificacao_id' => $id,
-            'usuario_id' => $usuario->id,
+            'usuario_id' => $usuarioId,
             'data_leitura' => $agora,
         ])->all();
 
@@ -204,10 +246,11 @@ class NotificacaoService
      */
     public static function contarNaoLidas(Usuario $usuario): int
     {
-        return Notificacao::whereDoesntHave('leituras', fn($q) => $q->where('usuario_id', $usuario->id))
+        $usuarioId = $usuario->obterId();
+
+        return Notificacao::whereDoesntHave('leituras', fn($q) => $q->where('usuario_id', $usuarioId))
             ->whereHas('destinos', function ($q) use ($usuario): void {
-                $q->where('destinatario_id', $usuario->id)
-                    ->where('destinatario_tipo', get_class($usuario));
+                self::aplicarFiltroDestinatario($q, $usuario);
             })
             ->count();
     }
@@ -254,13 +297,46 @@ class NotificacaoService
         $notificacao = Notificacao::find($notificacaoId);
 
         if (!$notificacao) {
+            Log::registrar($usuario->obterId(), 'NOTIFICACAO_DESTINO_FALHA', 'Tentativa de acessar notificação inexistente.', [
+                'notificacao_id' => $notificacaoId,
+                'usuario_id' => $usuario->obterId(),
+                'usuario_tipo' => ltrim(get_class($usuario), '\\'),
+                'usuario_tipo_normalizado' => self::normalizarTipoDestinatario(get_class($usuario)),
+            ]);
             return false;
         }
 
-        $destinatarioEncontrado = $notificacao->destinos()
-            ->where('destinatario_id', $usuario->obterId())
-            ->where('destinatario_tipo', get_class($usuario))
-            ->exists();
+        $usuarioId = $usuario->obterId();
+        $usuarioTipo = ltrim(get_class($usuario), '\\');
+        $usuarioTipoNormalizado = self::normalizarTipoDestinatario(get_class($usuario));
+
+        $destinos = $notificacao->destinos()->get(['destinatario_id', 'destinatario_tipo']);
+        $destinatarioEncontrado = $destinos->contains(function ($destino) use ($usuarioId, $usuarioTipo, $usuarioTipoNormalizado): bool {
+            $destinatarioId = (int) ($destino->destinatario_id ?? 0);
+            $destinatarioTipoRaw = (string) ($destino->destinatario_tipo ?? '');
+            $destinatarioTipo = ltrim($destinatarioTipoRaw, '\\');
+            $destinatarioTipoNormalizado = self::normalizarTipoDestinatario($destinatarioTipoRaw);
+
+            if ($destinatarioId !== $usuarioId) {
+                return false;
+            }
+
+            return $destinatarioTipo === $usuarioTipo || $destinatarioTipoNormalizado === $usuarioTipoNormalizado;
+        });
+
+        if (!$destinatarioEncontrado) {
+            Log::registrar($usuarioId, 'NOTIFICACAO_DESTINO_FALHA', 'Usuário não é destinatário desta notificação.', [
+                'notificacao_id' => $notificacaoId,
+                'usuario_id' => $usuarioId,
+                'usuario_tipo' => $usuarioTipo,
+                'usuario_tipo_normalizado' => $usuarioTipoNormalizado,
+                'destinos' => $destinos->take(20)->map(fn($d) => [
+                    'destinatario_id' => $d->destinatario_id,
+                    'destinatario_tipo' => $d->destinatario_tipo,
+                    'destinatario_tipo_normalizado' => self::normalizarTipoDestinatario($d->destinatario_tipo),
+                ])->values()->all(),
+            ]);
+        }
 
         return $destinatarioEncontrado;
     }
