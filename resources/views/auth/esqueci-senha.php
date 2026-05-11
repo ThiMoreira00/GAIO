@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 
 <head>
-    <?php include_once __DIR__ . '/../layouts/_head.php'; ?>
+    <?php include_once __DIR__ . '/../_layouts/_head.php'; ?>
     <title>Esqueci minha senha | GAIO</title>
 </head>
 

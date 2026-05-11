@@ -160,7 +160,7 @@ abstract class Response
         }
 
         // Renderização do layout
-        $caminhoLayout = self::$baseViewPath . "layouts/{$layout}.php";
+        $caminhoLayout = self::$baseViewPath . "_layouts/{$layout}.php";
 
         if (!file_exists($caminhoLayout)) {
             return $conteudo;
