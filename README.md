@@ -18,6 +18,6 @@ O **Sistema Acadêmico GAIO**, acrônimo de **Gerenciador Acadêmico Institucion
 - [@ThiMoreira00](https://www.github.com/ThiMoreira00) - Idealizador e Desenvolvedor do Projeto
 
 ## 📄 Licença
-Este projeto está licenciado sob a Licença PolyForm Internal Use License 1.0.0.
+Este projeto está licenciado sob a Licença PolyForm Noncommercial Use License 1.0.0.
 
 O software pode ser utilizado internamente pela instituição, mas existem restrições quanto à comercialização e distribuição para terceiros. Veja o arquivo [LICENSE](LICENSE) para mais detalhes sobre os termos de uso.
