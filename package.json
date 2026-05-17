@@ -1,6 +1,22 @@
 {
   "dependencies": {
-    "@tailwindcss/cli": "^4.2.4",
-    "tailwindcss": "^4.2.4"
-  }
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  },
+  "name": "sistemagaio",
+  "version": "1.0.0",
+  "description": "O Sistema Acadêmico GAIO, acrônimo de Gerenciador Acadêmico Institucional Online, é um sistema acadêmico para instituições públicas de ensino superior, desenvolvido como Trabalho de Conclusão de Curso em Análise e Desenvolvimento de Sistemas na FAETERJ Rio de Janeiro.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThiMoreira00/GAIO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ThiMoreira00/GAIO/issues"
+  },
+  "homepage": "https://github.com/ThiMoreira00/GAIO#readme"
 }
